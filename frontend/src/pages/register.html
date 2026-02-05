@@ -1,0 +1,63 @@
+<!-- Register Page -->
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Register for JLN Hub</h2>
+        <p class="auth-subtitle">Create your learning account</p>
+        
+        <form id="register-form" class="auth-form">
+            <div class="form-group">
+                <label for="reg-username">Username *</label>
+                <input type="text" id="reg-username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="reg-email">Email (optional)</label>
+                <input type="email" id="reg-email" name="email">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="reg-firstname">First Name</label>
+                    <input type="text" id="reg-firstname" name="first_name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-lastname">Last Name</label>
+                    <input type="text" id="reg-lastname" name="last_name">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="reg-grade">Grade Level</label>
+                    <select id="reg-grade" name="grade">
+                        <option value="">Select Grade</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-school">School Name</label>
+                    <input type="text" id="reg-school" name="school_name">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="reg-password">Password *</label>
+                <input type="password" id="reg-password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="reg-password2">Confirm Password *</label>
+                <input type="password" id="reg-password2" name="password2" required>
+            </div>
+            
+            <div id="register-error" class="error-message" style="display: none;"></div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+        
+        <p class="auth-switch">
+            Already have an account? <a href="#login">Login here</a>
+        </p>
+    </div>
+</div>

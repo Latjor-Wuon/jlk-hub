@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLN Hub - Jinubia Learning Nexus</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🎓 JLN Hub</h1>
+                <p class="tagline">Offline-First Learning Platform</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active" data-page="home">Home</a></li>
+                <li><a href="#subjects" class="nav-link" data-page="subjects">Subjects</a></li>
+                <li><a href="#lessons" class="nav-link" data-page="lessons">Lessons</a></li>
+                <li><a href="#progress" class="nav-link" data-page="progress">My Progress</a></li>
+                <li id="admin-nav-link" style="display: none;"><a href="#admin-dashboard" class="nav-link" data-page="admin-dashboard">Admin Dashboard</a></li>
+            </ul>
+            <div class="nav-auth" id="nav-auth">
+                <!-- Auth buttons will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Home Page -->
+            <div id="home-page" class="page active">
+                <section class="hero">
+                    <h2>Welcome to JLN Hub</h2>
+                    <p>Access South Sudan's national curriculum anytime, anywhere - even offline!</p>
+                    <div class="stats-grid" id="dashboard-stats">
+                        <div class="stat-card">
+                            <h3 id="stat-subjects">0</h3>
+                            <p>Subjects</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="stat-capsules">0</h3>
+                            <p>Lessons Available</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="stat-quizzes">0</h3>
+                            <p>Quizzes</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="stat-grades">0</h3>
+                            <p>Grade Levels</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="featured-section">
+                    <h3>Featured Lessons</h3>
+                    <div id="featured-lessons" class="lessons-grid">
+                        <p class="loading">Loading lessons...</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Subjects Page -->
+            <div id="subjects-page" class="page">
+                <h2>Subjects</h2>
+                <div id="subjects-list" class="subjects-grid">
+                    <p class="loading">Loading subjects...</p>
+                </div>
+            </div>
+
+            <!-- Lessons Page -->
+            <div id="lessons-page" class="page">
+                <h2>All Lessons</h2>
+                
+                <div class="filters">
+                    <select id="subject-filter" class="filter-select">
+                        <option value="">All Subjects</option>
+                    </select>
+                    <select id="grade-filter" class="filter-select">
+                        <option value="">All Grades</option>
+                    </select>
+                </div>
+
+                <div id="lessons-list" class="lessons-grid">
+                    <p class="loading">Loading lessons...</p>
+                </div>
+            </div>
+
+            <!-- Lesson Detail Page -->
+            <div id="lesson-detail-page" class="page">
+                <button class="btn-back" onclick="app.showPage('lessons')">← Back to Lessons</button>
+                <div id="lesson-content">
+                    <p class="loading">Loading lesson...</p>
+                </div>
+            </div>
+
+            <!-- Progress Page -->
+            <div id="progress-page" class="page">
+                <h2>My Learning Progress</h2>
+                <div id="progress-summary" class="progress-summary">
+                    <p class="info-message">Progress tracking will be available when you start lessons</p>
+                </div>
+                <div id="progress-list" class="progress-list">
+                </div>
+            </div>
+
+            <!-- Login Page -->
+            <div id="login-page" class="page">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- Register Page -->
+            <div id="register-page" class="page">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- Admin Dashboard Page -->
+            <div id="admin-dashboard-page" class="page">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Jinubia Learning Nexus Hub. Empowering learners in South Sudan.</p>
+            <p class="offline-indicator">
+                <span id="online-status">🟢 Online</span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/components/auth.js"></script>
+    <script type="module" src="/static/index.js"></script>
+</body>
+</html>

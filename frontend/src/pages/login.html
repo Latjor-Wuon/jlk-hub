@@ -1,0 +1,31 @@
+<!-- Login Page -->
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Login to JLN Hub</h2>
+        <p class="auth-subtitle">Access your learning dashboard</p>
+        
+        <form id="login-form" class="auth-form">
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" name="password" required>
+            </div>
+            
+            <div id="login-error" class="error-message" style="display: none;"></div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        
+        <p class="auth-switch">
+            Don't have an account? <a href="#register">Register here</a>
+        </p>
+        
+        <p class="auth-switch">
+            <a href="#home">Continue as guest</a>
+        </p>
+    </div>
+</div>
