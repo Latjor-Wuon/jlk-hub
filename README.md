@@ -51,7 +51,11 @@ JLN Hub/
         ├── app.js            # Application logic
         └── styles.css        # Styling
 ```
-
+**GitHub repo links**
+   - Main repo: https://github.com/Latjor-Wuon/jlk-hub
+   - Frontend: https://github.com/Latjor-Wuon/jlk-hub/tree/master/frontend
+   - Backend: https://github.com/Latjor-Wuon/jlk-hub/tree/master/backend
+   
 ## Setup Instructions
 
 ### Prerequisites
@@ -113,6 +117,7 @@ JLN Hub/
    - Frontend: http://localhost:8000/
    - API: http://localhost:8000/api/
    - Admin Panel: http://localhost:8000/admin/
+  
 
 ## API Endpoints
 
