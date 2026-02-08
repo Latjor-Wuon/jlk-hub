@@ -36,7 +36,7 @@ class DashboardViewSet(viewsets.ViewSet):
         
         return Response(stats)
     
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
+    @action(detail=False, methods=['get'])
     def admin_stats(self, request):
         """Get admin dashboard statistics"""
         # Basic counts
@@ -101,7 +101,7 @@ class DashboardViewSet(viewsets.ViewSet):
         
         return Response(stats)
     
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
+    @action(detail=False, methods=['get'])
     def users(self, request):
         """Get all users with their statistics"""
         users = User.objects.all().annotate(

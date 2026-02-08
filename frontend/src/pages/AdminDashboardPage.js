@@ -67,16 +67,6 @@ export function AdminDashboardPage() {
                         </div>
                     </div>
 
-                    <div class="stat-card stat-completion">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 id="avgCompletion">0%</h3>
-                            <p>Avg. Completion Rate</p>
-                        </div>
-                    </div>
-
                     <div class="stat-card stat-quiz-score">
                         <div class="stat-icon">
                             <i class="fas fa-trophy"></i>
@@ -500,7 +490,6 @@ function updateStatistics(stats) {
     document.getElementById('totalStudents').textContent = stats.total_students || 0;
     document.getElementById('totalCapsules').textContent = stats.total_capsules || 0;
     document.getElementById('totalQuizzes').textContent = stats.total_quizzes || 0;
-    document.getElementById('avgCompletion').textContent = (stats.average_completion_rate || 0).toFixed(1) + '%';
     document.getElementById('avgQuizScore').textContent = (stats.average_quiz_score || 0).toFixed(1) + '%';
 }
 
