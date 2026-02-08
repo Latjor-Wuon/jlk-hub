@@ -17,5 +17,5 @@ class QuizSerializer(serializers.ModelSerializer):
 
 class QuizSubmissionSerializer(serializers.Serializer):
     """Serializer for submitting quiz answers"""
-    quiz_id = serializers.IntegerField()
-    answers = serializers.DictField(child=serializers.CharField())
+    quiz_id = serializers.IntegerField(required=False)
+    answers = serializers.DictField(child=serializers.CharField(), required=True)
