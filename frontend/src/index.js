@@ -8,6 +8,8 @@ import { LessonsPage } from './pages/LessonsPage.js';
 import { LessonDetailPage } from './pages/LessonDetailPage.js';
 import { ProgressPage } from './pages/ProgressPage.js';
 import { AdminDashboardPage } from './pages/AdminDashboardPage.js';
+import { SimulationsPage } from './pages/SimulationsPage.js';
+import { QuizzesPage } from './pages/QuizzesPage.js';
 
 class JLNApp {
     constructor() {
@@ -30,6 +32,8 @@ class JLNApp {
         this.router.register('lessons', (params) => this.showPage('lessons', params));
         this.router.register('lesson', (params) => this.showLessonDetail(params.id));
         this.router.register('progress', (params) => this.showPage('progress', params));
+        this.router.register('simulations', (params) => this.showPage('simulations', params));
+        this.router.register('quizzes', (params) => this.showPage('quizzes', params));
         this.router.register('admin-dashboard', (params) => this.showPage('admin-dashboard', params));
         this.router.register('login', (params) => this.showPage('login', params));
         this.router.register('register', (params) => this.showPage('register', params));
@@ -154,15 +158,24 @@ class JLNApp {
                 break;
 
             case 'progress':
-                if (!this.authManager.isAuthenticated()) {
-                    Notification.warning('Please login to view your progress');
-                    this.router.navigate('login');
-                    return;
-                }
                 if (!this.pages.progress) {
                     this.pages.progress = new ProgressPage(pageElement);
                 }
-                this.pages.progress.render();
+                await this.pages.progress.render();
+                break;
+
+            case 'simulations':
+                if (!this.pages.simulations) {
+                    this.pages.simulations = new SimulationsPage(pageElement);
+                }
+                await this.pages.simulations.render();
+                break;
+
+            case 'quizzes':
+                if (!this.pages.quizzes) {
+                    this.pages.quizzes = new QuizzesPage(pageElement);
+                }
+                await this.pages.quizzes.render();
                 break;
 
             case 'admin-dashboard':

@@ -319,6 +319,143 @@ If the answer to most questions is no, it's a non-living thing!''',
             order=2
         )
 
+        # Create quiz for Subtraction
+        self.stdout.write('Creating Subtraction quiz...')
+        subtraction_quiz = Quiz.objects.create(
+            capsule=math_capsule_2,
+            title='Subtraction Practice Quiz',
+            instructions='Answer these subtraction questions. Take away!',
+            passing_score=70
+        )
+
+        Question.objects.create(
+            quiz=subtraction_quiz,
+            question_text='What is 5 - 2?',
+            question_type='multiple_choice',
+            options=['2', '3', '4', '5'],
+            correct_answer='3',
+            explanation='When you take 2 away from 5, you get 3.',
+            points=1,
+            order=1
+        )
+
+        Question.objects.create(
+            quiz=subtraction_quiz,
+            question_text='What is 7 - 3?',
+            question_type='multiple_choice',
+            options=['3', '4', '5', '6'],
+            correct_answer='4',
+            explanation='7 minus 3 equals 4.',
+            points=1,
+            order=2
+        )
+
+        Question.objects.create(
+            quiz=subtraction_quiz,
+            question_text='If you have 6 cookies and eat 2, how many are left?',
+            question_type='multiple_choice',
+            options=['2', '3', '4', '5'],
+            correct_answer='4',
+            explanation='6 - 2 = 4. You have 4 cookies left.',
+            points=1,
+            order=3
+        )
+
+        # Create quiz for English Alphabet
+        self.stdout.write('Creating Alphabet quiz...')
+        alphabet_quiz = Quiz.objects.create(
+            capsule=english_capsule_1,
+            title='Alphabet Recognition Quiz',
+            instructions='Test your knowledge of the English alphabet!',
+            passing_score=60
+        )
+
+        Question.objects.create(
+            quiz=alphabet_quiz,
+            question_text='What letter comes after B?',
+            question_type='multiple_choice',
+            options=['A', 'C', 'D', 'E'],
+            correct_answer='C',
+            explanation='The alphabet goes A, B, C. So C comes after B.',
+            points=1,
+            order=1
+        )
+
+        Question.objects.create(
+            quiz=alphabet_quiz,
+            question_text='What letter starts the word "Apple"?',
+            question_type='multiple_choice',
+            options=['A', 'B', 'P', 'E'],
+            correct_answer='A',
+            explanation='Apple starts with the letter A.',
+            points=1,
+            order=2
+        )
+
+        Question.objects.create(
+            quiz=alphabet_quiz,
+            question_text='How many letters are in the English alphabet?',
+            question_type='multiple_choice',
+            options=['24', '25', '26', '27'],
+            correct_answer='26',
+            explanation='The English alphabet has 26 letters from A to Z.',
+            points=1,
+            order=3
+        )
+
+        Question.objects.create(
+            quiz=alphabet_quiz,
+            question_text='What is the last letter of the alphabet?',
+            question_type='multiple_choice',
+            options=['X', 'Y', 'Z', 'W'],
+            correct_answer='Z',
+            explanation='Z is the 26th and last letter of the alphabet.',
+            points=1,
+            order=4
+        )
+
+        # Create quiz for Social Studies
+        self.stdout.write('Creating Social Studies quiz...')
+        social_quiz = Quiz.objects.create(
+            capsule=social_capsule_1,
+            title='Family and Community Quiz',
+            instructions='Answer questions about families and communities',
+            passing_score=70
+        )
+
+        Question.objects.create(
+            quiz=social_quiz,
+            question_text='Who helps us learn at school?',
+            question_type='multiple_choice',
+            options=['Doctors', 'Teachers', 'Shopkeepers', 'Farmers'],
+            correct_answer='Teachers',
+            explanation='Teachers are community helpers who help us learn at school.',
+            points=1,
+            order=1
+        )
+
+        Question.objects.create(
+            quiz=social_quiz,
+            question_text='Who grows food for us to eat?',
+            question_type='multiple_choice',
+            options=['Police officers', 'Nurses', 'Farmers', 'Teachers'],
+            correct_answer='Farmers',
+            explanation='Farmers grow crops and raise animals to provide us with food.',
+            points=1,
+            order=2
+        )
+
+        Question.objects.create(
+            quiz=social_quiz,
+            question_text='Who keeps us safe in the community?',
+            question_type='multiple_choice',
+            options=['Police officers', 'Shopkeepers', 'Farmers', 'Teachers'],
+            correct_answer='Police officers',
+            explanation='Police officers are community helpers who keep us safe.',
+            points=1,
+            order=3
+        )
+
         # Create Social Studies Lesson
         self.stdout.write('Creating Social Studies lessons...')
         
@@ -379,7 +516,7 @@ We can help our community by:
         self.stdout.write(f'  - 4 Subjects')
         self.stdout.write(f'  - 12 Grades')
         self.stdout.write(f'  - 6 Curriculum Capsules (Lessons)')
-        self.stdout.write(f'  - 2 Quizzes with Questions')
+        self.stdout.write(f'  - 5 Quizzes with Questions')
         self.stdout.write(self.style.SUCCESS('\nYou can now:'))
         self.stdout.write('  1. Visit http://127.0.0.1:8000/ to see the lessons')
         self.stdout.write('  2. Visit http://127.0.0.1:8000/admin/ to add more content')

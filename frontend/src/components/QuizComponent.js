@@ -59,6 +59,13 @@ export class QuizComponent {
         event.preventDefault();
         
         const form = event.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        // Show loading state
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Submitting...';
+        submitBtn.disabled = true;
+        
         const formData = new FormData(form);
         const answers = {};
         
@@ -68,14 +75,23 @@ export class QuizComponent {
             answers[questionId] = value;
         }
         
-        // Submit to API
-        const result = await apiClient.post(`/quizzes/${this.quiz.id}/submit/`, {
-            quiz_id: this.quiz.id,
-            answers: answers
-        });
-        
-        if (result) {
-            this.displayResults(result);
+        try {
+            // Submit to API
+            const result = await apiClient.post(`/quizzes/${this.quiz.id}/submit/`, {
+                quiz_id: this.quiz.id,
+                answers: answers
+            });
+            
+            if (result) {
+                this.displayResults(result);
+            } else {
+                throw new Error('No result returned');
+            }
+        } catch (error) {
+            console.error('Quiz submission error:', error);
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            alert('Failed to submit quiz. Please try again.');
         }
     }
 

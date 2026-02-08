@@ -2,15 +2,26 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from api.models import Quiz, QuizAttempt
 from api.serializers import QuizSerializer, QuizSubmissionSerializer
 
 
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    """Session auth without CSRF enforcement for quiz submissions"""
+    def enforce_csrf(self, request):
+        return  # Skip CSRF check
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class QuizViewSet(viewsets.ReadOnlyModelViewSet):
     """API endpoint for quizzes"""
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = [AllowAny]
+    authentication_classes = [CsrfExemptSessionAuthentication]
     
     @action(detail=True, methods=['post'])
     def submit(self, request, pk=None):

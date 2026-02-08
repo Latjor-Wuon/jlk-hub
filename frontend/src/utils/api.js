@@ -3,6 +3,49 @@
 export const API_BASE_URL = '/api';
 const API_BASE = API_BASE_URL;
 
+// Get CSRF token from cookie
+function getCsrfToken() {
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Get auth token from localStorage
+function getAuthToken() {
+    return localStorage.getItem('jln_token');
+}
+
+// Build headers with auth and CSRF tokens
+function buildHeaders(includeAuth = true) {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
+    }
+    
+    if (includeAuth) {
+        const authToken = getAuthToken();
+        if (authToken) {
+            headers['Authorization'] = `Token ${authToken}`;
+        }
+    }
+    
+    return headers;
+}
+
 class APIClient {
     constructor() {
         this.baseURL = API_BASE;
@@ -12,7 +55,10 @@ class APIClient {
         try {
             const url = `${this.baseURL}${endpoint}`;
             console.log('API GET:', url);
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                headers: buildHeaders(),
+                credentials: 'same-origin'
+            });
             console.log('Response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -30,12 +76,13 @@ class APIClient {
         try {
             const response = await fetch(`${this.baseURL}${endpoint}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+                headers: buildHeaders(),
+                body: JSON.stringify(data),
+                credentials: 'same-origin'
             });
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('POST Error Response:', errorText);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return await response.json();
@@ -49,10 +96,9 @@ class APIClient {
         try {
             const response = await fetch(`${this.baseURL}${endpoint}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+                headers: buildHeaders(),
+                body: JSON.stringify(data),
+                credentials: 'same-origin'
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -68,6 +114,8 @@ class APIClient {
         try {
             const response = await fetch(`${this.baseURL}${endpoint}`, {
                 method: 'DELETE',
+                headers: buildHeaders(),
+                credentials: 'same-origin'
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

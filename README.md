@@ -100,9 +100,9 @@ JLN Hub/
 
 7. **Load sample data (optional)**
    ```bash
-   python manage.py shell
+   python manage.py populate_data
+   python manage.py populate_simulations
    ```
-   Then run the sample data script (to be created).
 
 8. **Run the development server**
    ```bash
@@ -138,34 +138,105 @@ JLN Hub/
 - `POST /api/progress/` - Create/update progress
 - `GET /api/progress/summary/` - Get progress summary
 
+### Adaptive Learning
+- `GET /api/adaptive/pathway/` - Get personalized learning pathway
+- `POST /api/adaptive/analyze_quiz/` - Analyze quiz for recommendations
+- `POST /api/adaptive/dismiss_recommendation/` - Dismiss a recommendation
+- `GET /api/adaptive/revision_history/` - Get revision history
+
+### Simulations
+- `GET /api/simulations/` - List all simulations
+- `GET /api/simulations/{id}/` - Get simulation details
+- `POST /api/simulations/{id}/start/` - Start a simulation
+- `POST /api/simulations/{id}/complete/` - Complete a simulation
+- `GET /api/simulations/{id}/hints/` - Get simulation hints
+- `GET /api/simulations/types/` - Get simulation types
+- `GET /api/simulations/by_capsule/?capsule_id={id}` - Get simulations for a capsule
+
 ### Dashboard
 - `GET /api/dashboard/stats/` - Get application statistics
+- `GET /api/dashboard/admin_stats/` - Get admin dashboard statistics
 
 ## Features Implementation Status
 
+### Core Features
 - ✅ Basic project structure
 - ✅ Database models for curriculum content
 - ✅ REST API endpoints
 - ✅ Frontend UI with responsive design
-- ✅ Lesson viewing functionality
-- ✅ Quiz system with instant feedback
-- ✅ User authentication
+- ✅ User authentication system
+
+### Feature 1: Offline Curriculum Capsules
+- ✅ Self-contained learning units
+- ✅ Lesson explanations and examples
+- ✅ Grade-level objectives alignment
+- ✅ SQLite database for offline storage
+
+### Feature 2: AI-Assisted Interactive Lesson Generation
+- ✅ Structured lesson format
+- ✅ Clear sections with examples
+- ✅ Embedded practice questions
+- ✅ Locally stored lessons
+
+### Feature 3: Embedded Quizzes and Instant Feedback
+- ✅ Multiple question types (multiple choice, true/false)
+- ✅ Automatic grading
+- ✅ Instant feedback with explanations
+- ✅ Score tracking and pass/fail indicators
+
+### Feature 4: Adaptive Learning Pathways
+- ✅ Performance analysis based on quiz scores
+- ✅ Personalized recommendations for revision or advancement
+- ✅ Difficulty level tracking per subject
+- ✅ Suggested next lessons based on progress
+- ✅ Revision activity tracking with improvement scores
+
+### Feature 5: Practical Learning Simulations
+- ✅ Math visualizations (fractions, arrays, place value)
+- ✅ Science experiments (water cycle, plant growth)
+- ✅ Interactive diagrams (circuit builder)
+- ✅ AI-generated hints for guided learning
+- ✅ Progress tracking for simulation interactions
+
+### Feature 6: Teacher and Administrator Dashboard
+- ✅ Learner activity summaries
+- ✅ Quiz outcome analytics
+- ✅ Learning gap identification
+- ✅ Performance visualization with charts
+- ✅ User management view
+
+### Feature 7: Learning Progress Tracking
+- ✅ Local progress storage
+- ✅ Lesson completion rates
+- ✅ Quiz attempt history
+- ✅ Time spent tracking
+- ✅ Continuity across sessions
 
 ## Development Guidelines
 
 ### Adding Sample Data
 
-Use the Django admin panel (http://localhost:8000/admin/) to add:
+```bash
+# Load curriculum data
+python manage.py populate_data
+
+# Load simulation data
+python manage.py populate_simulations
+```
+
+Or use the Django admin panel (http://localhost:8000/admin/) to add:
 1. Subjects (e.g., Mathematics, English, Science)
 2. Grades (e.g., Primary 1-8, Secondary 1-4)
 3. Curriculum Capsules (Lessons with content)
 4. Quizzes and Questions
+5. Learning Simulations
 
 ### Extending the Application
 
-- **New API endpoints**: Add to `backend/api/views.py` and `backend/api/urls.py`
+- **New API endpoints**: Add views in `backend/api/views/` and update `backend/api/urls.py`
 - **New models**: Define in `backend/api/models.py`, then run migrations
-- **Frontend features**: Update `frontend/src/app.js` and `frontend/src/styles.css`
+- **New serializers**: Create in `backend/api/serializers/`
+- **Frontend features**: Add pages in `frontend/src/pages/` and components in `frontend/src/components/`
 
 ## Testing
 
@@ -188,7 +259,7 @@ python manage.py test
 - **PythonAnywhere**: Free tier for development
 - **AWS/Azure**: For production scale
 
-### Offline-First Features (Coming Soon)
+### Offline-First Features (Planned)
 - Service Workers for caching
 - IndexedDB for local data storage
 - Background sync for progress updates
