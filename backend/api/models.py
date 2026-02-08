@@ -128,3 +128,132 @@ class QuizAttempt(models.Model):
     
     def __str__(self):
         return f"{self.learner.username} - {self.quiz.title}: {self.score}/{self.max_score}"
+
+
+class LearnerDifficultyLevel(models.Model):
+    """Tracks learner difficulty level per subject for adaptive pathways"""
+    DIFFICULTY_CHOICES = [
+        ('beginner', 'Beginner'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
+    ]
+    
+    learner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='difficulty_levels')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    current_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
+    average_score = models.FloatField(default=0.0)
+    total_attempts = models.IntegerField(default=0)
+    consecutive_passes = models.IntegerField(default=0)
+    consecutive_fails = models.IntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['learner', 'subject']
+    
+    def __str__(self):
+        return f"{self.learner.username} - {self.subject.name}: {self.current_level}"
+
+
+class LearningRecommendation(models.Model):
+    """Adaptive learning recommendations based on performance"""
+    RECOMMENDATION_TYPES = [
+        ('revision', 'Revision Needed'),
+        ('practice', 'Additional Practice'),
+        ('next_lesson', 'Ready for Next Lesson'),
+        ('mastery', 'Concept Mastered'),
+        ('simplified', 'Simplified Explanation'),
+    ]
+    
+    learner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recommendations')
+    capsule = models.ForeignKey(CurriculumCapsule, on_delete=models.CASCADE)
+    recommendation_type = models.CharField(max_length=20, choices=RECOMMENDATION_TYPES)
+    reason = models.TextField()
+    suggested_capsules = models.ManyToManyField(
+        CurriculumCapsule, 
+        related_name='recommended_for',
+        blank=True
+    )
+    is_active = models.BooleanField(default=True)
+    priority = models.IntegerField(default=5)  # 1=highest, 10=lowest
+    created_at = models.DateTimeField(auto_now_add=True)
+    dismissed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['priority', '-created_at']
+    
+    def __str__(self):
+        return f"{self.learner.username}: {self.recommendation_type} - {self.capsule.title}"
+
+
+class RevisionActivity(models.Model):
+    """Tracks revision activities for adaptive learning"""
+    learner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='revision_activities')
+    capsule = models.ForeignKey(CurriculumCapsule, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, null=True, blank=True)
+    revision_count = models.IntegerField(default=0)
+    last_revision = models.DateTimeField(auto_now=True)
+    improvement_score = models.FloatField(default=0.0)  # Difference from first to latest attempt
+    notes = models.TextField(blank=True)
+    
+    class Meta:
+        unique_together = ['learner', 'capsule']
+    
+    def __str__(self):
+        return f"{self.learner.username} - {self.capsule.title} (Revisions: {self.revision_count})"
+
+
+class LearningSimulation(models.Model):
+    """Interactive simulations for science and math concepts"""
+    SIMULATION_TYPES = [
+        ('math_visualization', 'Math Visualization'),
+        ('science_experiment', 'Science Experiment'),
+        ('interactive_diagram', 'Interactive Diagram'),
+        ('step_by_step', 'Step by Step Guide'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    simulation_type = models.CharField(max_length=30, choices=SIMULATION_TYPES)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='simulations')
+    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name='simulations')
+    related_capsule = models.ForeignKey(
+        CurriculumCapsule, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='simulations'
+    )
+    # Configuration stored as JSON for flexibility
+    config = models.JSONField(default=dict, help_text="Simulation configuration and parameters")
+    instructions = models.TextField(blank=True)
+    hints = models.JSONField(default=list, help_text="AI-generated hints for the simulation")
+    learning_objectives = models.JSONField(default=list)
+    difficulty_level = models.CharField(max_length=20, default='intermediate')
+    estimated_time = models.IntegerField(default=10, help_text="Estimated time in minutes")
+    is_published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['subject', 'grade', 'title']
+    
+    def __str__(self):
+        return f"{self.title} ({self.simulation_type})"
+
+
+class SimulationInteraction(models.Model):
+    """Tracks learner interactions with simulations"""
+    learner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='simulation_interactions')
+    simulation = models.ForeignKey(LearningSimulation, on_delete=models.CASCADE, related_name='interactions')
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    time_spent = models.IntegerField(default=0, help_text="Time spent in seconds")
+    interaction_data = models.JSONField(default=dict, help_text="Recorded user interactions")
+    hints_used = models.IntegerField(default=0)
+    completed_successfully = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-started_at']
+    
+    def __str__(self):
+        return f"{self.learner.username} - {self.simulation.title}"

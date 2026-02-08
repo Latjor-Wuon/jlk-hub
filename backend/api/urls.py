@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from api.views import (
     SubjectViewSet, GradeViewSet, CurriculumCapsuleViewSet,
     QuizViewSet, LearningProgressViewSet, QuizAttemptViewSet,
-    DashboardViewSet
+    DashboardViewSet, AdaptiveLearningViewSet, SimulationViewSet,
+    SimulationInteractionViewSet
 )
 from api.views.auth_views import (
     RegisterView, login_view, logout_view, current_user_view, UserProfileView, csrf_token_view
@@ -17,6 +18,9 @@ router.register(r'quizzes', QuizViewSet, basename='quiz')
 router.register(r'progress', LearningProgressViewSet, basename='progress')
 router.register(r'quiz-attempts', QuizAttemptViewSet, basename='quiz-attempt')
 router.register(r'dashboard', DashboardViewSet, basename='dashboard')
+router.register(r'adaptive', AdaptiveLearningViewSet, basename='adaptive')
+router.register(r'simulations', SimulationViewSet, basename='simulation')
+router.register(r'simulation-interactions', SimulationInteractionViewSet, basename='simulation-interaction')
 
 urlpatterns = [
     path('', include(router.urls)),
