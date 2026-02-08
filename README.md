@@ -55,6 +55,7 @@ JLN Hub/
    - Main repo: https://github.com/Latjor-Wuon/jlk-hub
    - Frontend: https://github.com/Latjor-Wuon/jlk-hub/tree/master/frontend
    - Backend: https://github.com/Latjor-Wuon/jlk-hub/tree/master/backend
+   - Demo&screenshoots: https://github.com/Latjor-Wuon/jlk-hub/tree/master/assets
    
 ## Setup Instructions
 
