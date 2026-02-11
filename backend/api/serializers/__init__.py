@@ -12,6 +12,13 @@ from .simulation_serializers import (
     LearningSimulationListSerializer, LearningSimulationDetailSerializer,
     SimulationInteractionSerializer
 )
+from .lesson_generation_serializers import (
+    TextbookChapterSerializer, TextbookChapterListSerializer,
+    GeneratedLessonSerializer, GeneratedLessonListSerializer,
+    LessonSectionSerializer, GeneratedQuestionSerializer,
+    LessonGenerationRequestSerializer, LessonPublishSerializer,
+    LessonReviewSerializer, BatchGenerationSerializer
+)
 
 __all__ = [
     'SubjectSerializer',
@@ -30,4 +37,14 @@ __all__ = [
     'LearningSimulationListSerializer',
     'LearningSimulationDetailSerializer',
     'SimulationInteractionSerializer',
+    'TextbookChapterSerializer',
+    'TextbookChapterListSerializer',
+    'GeneratedLessonSerializer',
+    'GeneratedLessonListSerializer',
+    'LessonSectionSerializer',
+    'GeneratedQuestionSerializer',
+    'LessonGenerationRequestSerializer',
+    'LessonPublishSerializer',
+    'LessonReviewSerializer',
+    'BatchGenerationSerializer',
 ]

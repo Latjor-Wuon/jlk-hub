@@ -10,6 +10,7 @@ import { ProgressPage } from './pages/ProgressPage.js';
 import { AdminDashboardPage } from './pages/AdminDashboardPage.js';
 import { SimulationsPage } from './pages/SimulationsPage.js';
 import { QuizzesPage } from './pages/QuizzesPage.js';
+import { LessonGeneratorPage } from './pages/LessonGeneratorPage.js';
 
 class JLNApp {
     constructor() {
@@ -35,6 +36,7 @@ class JLNApp {
         this.router.register('simulations', (params) => this.showPage('simulations', params));
         this.router.register('quizzes', (params) => this.showPage('quizzes', params));
         this.router.register('admin-dashboard', (params) => this.showPage('admin-dashboard', params));
+        this.router.register('lesson-generator', (params) => this.showPage('lesson-generator', params));
         this.router.register('login', (params) => this.showPage('login', params));
         this.router.register('register', (params) => this.showPage('register', params));
 
@@ -76,6 +78,7 @@ class JLNApp {
     updateAuthUI() {
         const navAuth = document.getElementById('nav-auth');
         const adminNavLink = document.getElementById('admin-nav-link');
+        const lessonGenNavLink = document.getElementById('lesson-gen-nav-link');
         
         if (!navAuth) return;
 
@@ -88,9 +91,12 @@ class JLNApp {
                 <button class="btn-auth btn-logout" onclick="app.handleLogout()">Logout</button>
             `;
             
-            // Show/hide admin dashboard link based on user role
+            // Show/hide admin dashboard and lesson generator links based on user role
             if (adminNavLink) {
                 adminNavLink.style.display = user.is_staff ? 'block' : 'none';
+            }
+            if (lessonGenNavLink) {
+                lessonGenNavLink.style.display = user.is_staff ? 'block' : 'none';
             }
         } else {
             navAuth.innerHTML = `
@@ -98,9 +104,12 @@ class JLNApp {
                 <button class="btn-auth btn-register" onclick="app.router.navigate('register')">Register</button>
             `;
             
-            // Hide admin dashboard link when not authenticated
+            // Hide admin links when not authenticated
             if (adminNavLink) {
                 adminNavLink.style.display = 'none';
+            }
+            if (lessonGenNavLink) {
+                lessonGenNavLink.style.display = 'none';
             }
         }
     }
@@ -192,6 +201,13 @@ class JLNApp {
                 }
                 pageElement.innerHTML = '';
                 pageElement.appendChild(AdminDashboardPage());
+                break;
+
+            case 'lesson-generator':
+                if (!this.pages.lessonGenerator) {
+                    this.pages.lessonGenerator = new LessonGeneratorPage(pageElement);
+                }
+                await this.pages.lessonGenerator.render();
                 break;
 
             case 'login':

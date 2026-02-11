@@ -2,3 +2,26 @@ Django>=5.1.5
 djangorestframework>=3.15.0
 django-cors-headers>=4.6.0
 Pillow>=11.0.0
+
+# AI/ML Dependencies for Lesson Generation
+transformers>=4.36.0
+torch>=2.1.0
+sentencepiece>=0.1.99
+accelerate>=0.25.0
+
+# Optional: OpenAI API support (for content preparation phase)
+openai>=1.6.0
+tiktoken>=0.5.2
+
+# Text processing
+nltk>=3.8.1
+beautifulsoup4>=4.12.0
+
+# PDF processing
+PyPDF2>=3.0.0
+pdfplumber>=0.10.0
+
+# Job scheduling for background processing
+celery>=5.3.4
+redis>=5.0.1
+

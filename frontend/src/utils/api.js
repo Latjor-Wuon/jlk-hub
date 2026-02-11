@@ -129,3 +129,42 @@ class APIClient {
 }
 
 export const apiClient = new APIClient();
+
+// Wrapper function for API requests that matches the expected signature
+export async function apiRequest(url, method = 'GET', data = null) {
+    const endpoint = url.startsWith('/api') ? url.substring(4) : url;
+    
+    try {
+        switch (method.toUpperCase()) {
+            case 'GET':
+                return await apiClient.get(endpoint);
+            case 'POST':
+                // Handle FormData differently
+                if (data instanceof FormData) {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCsrfToken(),
+                            'Authorization': `Token ${getAuthToken()}`
+                        },
+                        body: data,
+                        credentials: 'same-origin'
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                }
+                return await apiClient.post(endpoint, data);
+            case 'PUT':
+                return await apiClient.put(endpoint, data);
+            case 'DELETE':
+                return await apiClient.delete(endpoint);
+            default:
+                throw new Error(`Unsupported method: ${method}`);
+        }
+    } catch (error) {
+        console.error(`API ${method} Error:`, error);
+        throw error;
+    }
+}

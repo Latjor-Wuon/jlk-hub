@@ -60,3 +60,8 @@ export class Notification {
 
 // Make it globally available
 window.Notification = Notification;
+
+// Export helper function for named import compatibility
+export function showNotification(message, type = 'info', duration = 4000) {
+    Notification.show(message, type, duration);
+}

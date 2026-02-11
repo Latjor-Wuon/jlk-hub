@@ -149,6 +149,20 @@ JLN Hub/
 - `POST /api/adaptive/dismiss_recommendation/` - Dismiss a recommendation
 - `GET /api/adaptive/revision_history/` - Get revision history
 
+### AI-Assisted Lesson Generation (New!)
+- `GET /api/chapters/` - List all textbook chapters
+- `POST /api/chapters/` - Upload a new textbook chapter
+- `POST /api/chapters/{id}/generate_lesson/` - Generate lesson from chapter
+- `POST /api/chapters/batch_generate/` - Batch generate lessons
+- `GET /api/chapters/statistics/` - Get chapter processing statistics
+- `GET /api/generated-lessons/` - List generated lessons
+- `GET /api/generated-lessons/{id}/` - Get lesson details
+- `POST /api/generated-lessons/{id}/review/` - Review and approve/reject lesson
+- `POST /api/generated-lessons/{id}/publish/` - Publish lesson to curriculum
+- `POST /api/generated-lessons/{id}/regenerate_questions/` - Regenerate questions
+- `GET /api/generated-lessons/pending_review/` - Get lessons pending review
+- `GET /api/generated-lessons/statistics/` - Get lesson generation statistics
+
 ### Simulations
 - `GET /api/simulations/` - List all simulations
 - `GET /api/simulations/{id}/` - Get simulation details
@@ -178,10 +192,19 @@ JLN Hub/
 - ✅ SQLite database for offline storage
 
 ### Feature 2: AI-Assisted Interactive Lesson Generation
-- ✅ Structured lesson format
-- ✅ Clear sections with examples
-- ✅ Embedded practice questions
-- ✅ Locally stored lessons
+- ✅ Textbook chapter upload and management
+- ✅ AI-powered content transformation (OpenAI API & rule-based)
+- ✅ Structured lesson format with multiple sections
+- ✅ Automatic learning objectives extraction
+- ✅ Key concepts identification
+- ✅ Embedded practice questions generation
+- ✅ Review and approval workflow
+- ✅ Batch processing support
+- ✅ Management command for offline generation
+- ✅ Publishing to CurriculumCapsules
+- ✅ Admin interface with status tracking
+- ✅ Locally stored lessons for offline access
+- 📚 **See [AI_LESSON_GENERATION.md](AI_LESSON_GENERATION.md) for detailed documentation**
 
 ### Feature 3: Embedded Quizzes and Instant Feedback
 - ✅ Multiple question types (multiple choice, true/false)
@@ -235,6 +258,44 @@ Or use the Django admin panel (http://localhost:8000/admin/) to add:
 3. Curriculum Capsules (Lessons with content)
 4. Quizzes and Questions
 5. Learning Simulations
+
+### Management Commands
+
+#### Generate Lessons from Textbook Content
+
+Transform uploaded textbook chapters into interactive lessons:
+
+```bash
+# Generate all uploaded chapters
+python manage.py generate_lessons --all
+
+# Generate specific chapter
+python manage.py generate_lessons --chapter-id 5
+
+# Generate for specific subject and grade
+python manage.py generate_lessons --subject "Mathematics" --grade "Primary 5"
+
+# Use OpenAI API for higher quality (requires API key)
+python manage.py generate_lessons --all --use-openai
+
+# Auto-publish generated lessons
+python manage.py generate_lessons --all --auto-publish
+
+# Batch process with limit
+python manage.py generate_lessons --all --max-chapters 10
+```
+
+**Options:**
+- `--all`: Process all unprocessed chapters
+- `--chapter-id ID`: Generate for specific chapter
+- `--subject NAME`: Filter by subject
+- `--grade NAME`: Filter by grade
+- `--use-openai`: Use OpenAI API (requires OPENAI_API_KEY in settings)
+- `--validate-only`: Validate without generating
+- `--auto-publish`: Automatically publish generated lessons
+- `--max-chapters N`: Limit number of chapters to process
+
+For more details, see [AI_LESSON_GENERATION.md](AI_LESSON_GENERATION.md)
 
 ### Extending the Application
 

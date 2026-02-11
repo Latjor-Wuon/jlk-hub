@@ -7,6 +7,13 @@ from .progress_views import LearningProgressViewSet, QuizAttemptViewSet
 from .dashboard_views import DashboardViewSet
 from .adaptive_views import AdaptiveLearningViewSet
 from .simulation_views import SimulationViewSet, SimulationInteractionViewSet
+from .lesson_generation_views import (
+    TextbookChapterViewSet,
+    GeneratedLessonViewSet,
+    LessonSectionViewSet,
+    GeneratedQuestionViewSet
+)
+from .system_views import ai_integration_status, system_health
 
 __all__ = [
     'SubjectViewSet',
@@ -19,4 +26,10 @@ __all__ = [
     'AdaptiveLearningViewSet',
     'SimulationViewSet',
     'SimulationInteractionViewSet',
+    'TextbookChapterViewSet',
+    'GeneratedLessonViewSet',
+    'LessonSectionViewSet',
+    'GeneratedQuestionViewSet',
+    'ai_integration_status',
+    'system_health',
 ]

@@ -257,3 +257,191 @@ class SimulationInteraction(models.Model):
     
     def __str__(self):
         return f"{self.learner.username} - {self.simulation.title}"
+
+
+class TextbookChapter(models.Model):
+    """Stores raw textbook content for AI-assisted lesson generation"""
+    STATUS_CHOICES = [
+        ('uploaded', 'Uploaded'),
+        ('processing', 'Processing'),
+        ('generated', 'Generated'),
+        ('published', 'Published'),
+        ('failed', 'Failed'),
+    ]
+    
+    title = models.CharField(max_length=300)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='textbook_chapters')
+    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name='textbook_chapters')
+    chapter_number = models.CharField(max_length=20, blank=True)
+    raw_content = models.TextField(help_text="Raw textbook content to be processed", blank=True)
+    pdf_file = models.FileField(upload_to='textbook_pdfs/', blank=True, null=True, help_text="PDF file to extract content from")
+    source_book = models.CharField(max_length=200, blank=True, help_text="Source textbook name")
+    page_numbers = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='uploaded')
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='uploaded_chapters')
+    processing_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['subject', 'grade', 'chapter_number']
+    
+    def __str__(self):
+        return f"{self.subject.name} - {self.grade.name}: {self.title}"
+
+
+class GeneratedLesson(models.Model):
+    """Stores AI-generated interactive lessons before publishing"""
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('published', 'Published'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    source_chapter = models.ForeignKey(
+        TextbookChapter, 
+        on_delete=models.CASCADE, 
+        related_name='generated_lessons'
+    )
+    title = models.CharField(max_length=300)
+    introduction = models.TextField(blank=True, help_text="AI-generated introduction")
+    learning_objectives = models.JSONField(default=list, help_text="Extracted learning objectives")
+    key_concepts = models.JSONField(default=list, help_text="Main concepts covered")
+    estimated_duration = models.IntegerField(default=30, help_text="Estimated time in minutes")
+    difficulty_level = models.CharField(max_length=20, default='intermediate')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    
+    # AI generation metadata
+    ai_model_used = models.CharField(max_length=100, blank=True)
+    generation_timestamp = models.DateTimeField(auto_now_add=True)
+    generation_params = models.JSONField(default=dict, help_text="Parameters used for generation")
+    quality_score = models.FloatField(default=0.0, help_text="AI confidence score")
+    
+    # Review and approval
+    reviewed_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='reviewed_lessons'
+    )
+    review_notes = models.TextField(blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    
+    # Published capsule reference
+    published_capsule = models.OneToOneField(
+        CurriculumCapsule,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='source_generated_lesson'
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} ({self.status})"
+
+
+class LessonSection(models.Model):
+    """Structured sections of a generated lesson"""
+    SECTION_TYPES = [
+        ('introduction', 'Introduction'),
+        ('explanation', 'Explanation'),
+        ('example', 'Example'),
+        ('practice', 'Practice Activity'),
+        ('real_world', 'Real World Application'),
+        ('summary', 'Summary'),
+        ('assessment', 'Quick Assessment'),
+    ]
+    
+    lesson = models.ForeignKey(
+        GeneratedLesson, 
+        on_delete=models.CASCADE, 
+        related_name='sections'
+    )
+    section_type = models.CharField(max_length=20, choices=SECTION_TYPES)
+    title = models.CharField(max_length=200)
+    content = models.TextField(help_text="Formatted section content")
+    order = models.IntegerField(default=0)
+    
+    # Interactive elements
+    has_interactive_elements = models.BooleanField(default=False)
+    interactive_data = models.JSONField(
+        default=dict, 
+        blank=True,
+        help_text="Interactive exercises, diagrams, or activities"
+    )
+    
+    # Embedded questions for this section
+    embedded_questions = models.JSONField(
+        default=list, 
+        blank=True,
+        help_text="Questions to check understanding"
+    )
+    
+    # Additional resources
+    hints = models.JSONField(default=list, blank=True)
+    additional_notes = models.TextField(blank=True)
+    
+    class Meta:
+        ordering = ['lesson', 'order']
+    
+    def __str__(self):
+        return f"{self.lesson.title} - {self.section_type}: {self.title}"
+
+
+class GeneratedQuestion(models.Model):
+    """AI-generated questions for lessons"""
+    QUESTION_TYPES = [
+        ('multiple_choice', 'Multiple Choice'),
+        ('true_false', 'True/False'),
+        ('short_answer', 'Short Answer'),
+        ('fill_blank', 'Fill in the Blank'),
+        ('matching', 'Matching'),
+    ]
+    
+    DIFFICULTY_LEVELS = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+    
+    lesson = models.ForeignKey(
+        GeneratedLesson, 
+        on_delete=models.CASCADE, 
+        related_name='generated_questions'
+    )
+    section = models.ForeignKey(
+        LessonSection, 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='section_questions'
+    )
+    question_text = models.TextField()
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES, default='multiple_choice')
+    difficulty_level = models.CharField(max_length=10, choices=DIFFICULTY_LEVELS, default='medium')
+    options = models.JSONField(default=list, help_text="Answer options")
+    correct_answer = models.TextField()
+    explanation = models.TextField(blank=True, help_text="AI-generated explanation")
+    hints = models.JSONField(default=list, blank=True)
+    bloom_taxonomy_level = models.CharField(
+        max_length=50, 
+        blank=True,
+        help_text="Bloom's taxonomy classification"
+    )
+    points = models.IntegerField(default=1)
+    order = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['lesson', 'order']
+    
+    def __str__(self):
+        return f"{self.lesson.title} - Q{self.order}: {self.question_text[:50]}"
