@@ -1277,12 +1277,12 @@ export class LessonGenerationComponent {
 
                         <div class="lesson-section">
                             <h4>Learning Objectives</h4>
-                            <p>${lesson.learning_objectives || 'No objectives defined'}</p>
+                            ${this.renderLearningObjectives(lesson.learning_objectives)}
                         </div>
 
                         <div class="lesson-section">
                             <h4>Key Concepts</h4>
-                            <p>${lesson.key_concepts || 'No key concepts defined'}</p>
+                            ${this.renderKeyConcepts(lesson.key_concepts)}
                         </div>
 
                         ${lesson.sections && lesson.sections.length ? `
@@ -1383,6 +1383,114 @@ export class LessonGenerationComponent {
             showNotification('Failed to publish lesson', 'error');
             console.error(error);
         }
+    }
+
+    /**
+     * Render learning objectives as a formatted list
+     */
+    renderLearningObjectives(objectives) {
+        if (!objectives || objectives.length === 0) {
+            return '<p>No learning objectives defined</p>';
+        }
+        
+        // Handle if it's a string (legacy format)
+        if (typeof objectives === 'string') {
+            // Split by common delimiters if it's a concatenated string
+            const items = objectives.split(/[,;]|\n/).filter(o => o.trim());
+            return `<ul>${items.map(obj => `<li>${this.cleanObjectiveText(obj.trim())}</li>`).join('')}</ul>`;
+        }
+        
+        // Handle array format
+        if (Array.isArray(objectives)) {
+            const cleanedObjectives = objectives
+                .filter(obj => obj && typeof obj === 'string' && obj.trim())
+                .map(obj => this.cleanObjectiveText(obj.trim()))
+                .filter(obj => obj.length > 5 && !obj.toLowerCase().includes('page_break'));
+            
+            if (cleanedObjectives.length === 0) {
+                return '<p>No learning objectives defined</p>';
+            }
+            
+            return `<ul>${cleanedObjectives.map(obj => `<li>${obj}</li>`).join('')}</ul>`;
+        }
+        
+        return '<p>No learning objectives defined</p>';
+    }
+
+    /**
+     * Clean objective text from artifacts
+     */
+    cleanObjectiveText(text) {
+        // Remove page break markers and markdown artifacts
+        let cleaned = text
+            .replace(/---page_break---/gi, '')
+            .replace(/##\s*/g, '')
+            .replace(/###\s*/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        
+        // Capitalize first letter
+        if (cleaned.length > 0) {
+            cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+        }
+        
+        return cleaned;
+    }
+
+    /**
+     * Render key concepts as formatted items
+     */
+    renderKeyConcepts(concepts) {
+        if (!concepts || concepts.length === 0) {
+            return '<p>No key concepts defined</p>';
+        }
+        
+        // Handle if it's a string (legacy format)
+        if (typeof concepts === 'string') {
+            const items = concepts.split(/[,;]|\n/).filter(c => c.trim() && c !== '[object Object]');
+            if (items.length === 0) return '<p>No key concepts defined</p>';
+            return `<div class="concepts-list">${items.map(c => `<span class="concept-tag">${c.trim()}</span>`).join('')}</div>`;
+        }
+        
+        // Handle array format
+        if (Array.isArray(concepts)) {
+            const validConcepts = concepts.filter(c => {
+                if (!c) return false;
+                if (typeof c === 'string') return c.trim() && c !== '[object Object]';
+                if (typeof c === 'object') return c.term || c.name;
+                return false;
+            });
+            
+            if (validConcepts.length === 0) {
+                return '<p>No key concepts defined</p>';
+            }
+            
+            return `<div class="concepts-grid">
+                ${validConcepts.map(concept => {
+                    if (typeof concept === 'string') {
+                        return `<div class="concept-item"><strong>${concept}</strong></div>`;
+                    }
+                    // Object with term and definition
+                    const term = concept.term || concept.name || 'Concept';
+                    const definition = concept.definition || concept.description || '';
+                    return `
+                        <div class="concept-item">
+                            <strong>${term}</strong>
+                            ${definition ? `<p>${definition}</p>` : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            <style>
+                .concepts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+                .concept-item { background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 3px solid #2563eb; }
+                .concept-item strong { color: #1e40af; display: block; margin-bottom: 4px; }
+                .concept-item p { margin: 0; font-size: 0.9em; color: #4b5563; }
+                .concept-tag { display: inline-block; background: #e0e7ff; padding: 4px 12px; border-radius: 20px; margin: 4px; font-size: 0.9em; }
+            </style>`;
+        }
+        
+        return '<p>No key concepts defined</p>';
     }
 
     /**

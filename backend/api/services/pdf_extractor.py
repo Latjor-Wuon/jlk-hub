@@ -144,8 +144,10 @@ class PDFExtractorService:
         Clean extracted text while preserving document structure.
         Maintains headings, bullet points, paragraphs, and logical sections.
         """
-        # Replace page markers with section dividers
-        text = re.sub(r'--- Page \d+ ---', '\n\n---PAGE_BREAK---\n\n', text)
+        # Completely remove page markers - they should not appear in final output
+        text = re.sub(r'---\s*Page\s*\d+\s*---', '\n\n', text, flags=re.IGNORECASE)
+        text = re.sub(r'---\s*PAGE_BREAK\s*---', '\n\n', text, flags=re.IGNORECASE)
+        text = re.sub(r'---\s*page_break\s*---', '\n\n', text, flags=re.IGNORECASE)
         
         # Normalize line endings
         text = text.replace('\r\n', '\n').replace('\r', '\n')
@@ -158,18 +160,24 @@ class PDFExtractorService:
         for line in lines:
             stripped = line.strip()
             
-            # Skip completely empty lines but mark as paragraph break
+            # Skip empty lines but mark as paragraph break
             if not stripped:
                 if not prev_line_empty:
                     processed_lines.append('')
                     prev_line_empty = True
                 continue
             
+            # Skip lines that look like page artifacts
+            if re.match(r'^(page\s*\d+|\d+\s*$|---+$)', stripped, re.IGNORECASE):
+                continue
+            
             prev_line_empty = False
             
             # Detect and preserve bullet points
-            if re.match(r'^[\u2022\u2023\u25E6\u2043\u2219•●○◦▪▸►]\s*', stripped):
-                processed_lines.append('• ' + re.sub(r'^[\u2022\u2023\u25E6\u2043\u2219•●○◦▪▸►]\s*', '', stripped))
+            if re.match(r'^[\u2022\u2023\u25E6\u2043\u2219•●○◦▪▸►\-\*]\s*', stripped):
+                bullet_content = re.sub(r'^[\u2022\u2023\u25E6\u2043\u2219•●○◦▪▸►\-\*]\s*', '', stripped)
+                if bullet_content:  # Only add if there's actual content
+                    processed_lines.append('• ' + bullet_content)
                 continue
             
             # Detect numbered lists (1. or 1) or a. or a))
@@ -178,13 +186,24 @@ class PDFExtractorService:
                 continue
             
             # Detect potential headings (short lines, possibly uppercase or title case)
-            if len(stripped) < 100:
-                # All caps heading
-                if stripped.isupper() and len(stripped) > 3:
+            if len(stripped) < 80 and len(stripped) > 3:
+                # Skip if it looks like a page number or artifact
+                if stripped.isdigit():
+                    continue
+                    
+                # All caps heading (but not single letters)
+                if stripped.isupper() and len(stripped.split()) > 1:
                     processed_lines.append(f'\n## {stripped.title()}\n')
                     continue
-                # Title case or short distinctive line
-                elif stripped.istitle() and len(stripped.split()) <= 8:
+                    
+                # Title case with 2-8 words - likely a heading
+                words = stripped.split()
+                if 2 <= len(words) <= 8 and stripped.istitle():
+                    processed_lines.append(f'\n### {stripped}\n')
+                    continue
+                    
+                # Lines ending with colon often indicate section headers
+                if stripped.endswith(':') and len(stripped) < 60:
                     processed_lines.append(f'\n### {stripped}\n')
                     continue
             
@@ -193,9 +212,6 @@ class PDFExtractorService:
             processed_lines.append(cleaned_line)
         
         text = '\n'.join(processed_lines)
-        
-        # Remove page break markers and replace with proper section breaks
-        text = re.sub(r'---PAGE_BREAK---', '\n\n', text)
         
         # Consolidate multiple blank lines
         text = re.sub(r'\n{4,}', '\n\n\n', text)

@@ -337,10 +337,13 @@ IMPORTANT GUIDELINES:
     def _preprocess_content_for_ai(self, content: str) -> str:
         """
         Preprocess extracted PDF content to make it more understandable for AI.
-        Cleans up common PDF extraction issues.
+        Cleans up common PDF extraction issues and removes artifacts.
         """
-        # Fix common PDF extraction issues
         processed = content
+        
+        # Remove all page break markers completely
+        processed = re.sub(r'---\s*page[\s_]*break\s*---', '', processed, flags=re.IGNORECASE)
+        processed = re.sub(r'---\s*Page\s*\d+\s*---', '', processed, flags=re.IGNORECASE)
         
         # Fix hyphenated words split across lines
         processed = re.sub(r'(\w+)-\n(\w+)', r'\1\2', processed)
@@ -359,6 +362,10 @@ IMPORTANT GUIDELINES:
         
         # Clean up header/footer artifacts (common patterns)
         processed = re.sub(r'^(Chapter \d+|Page \d+|Copyright.*|All rights reserved.*)$', '', processed, flags=re.MULTILINE | re.IGNORECASE)
+        
+        # Remove markdown heading markers that are just artifacts
+        processed = re.sub(r'^##\s*$', '', processed, flags=re.MULTILINE)
+        processed = re.sub(r'^###\s*$', '', processed, flags=re.MULTILINE)
         
         # Consolidate multiple blank lines
         processed = re.sub(r'\n{3,}', '\n\n', processed)
@@ -417,6 +424,11 @@ IMPORTANT GUIDELINES:
         """Extract or generate meaningful learning objectives"""
         objectives = []
         
+        # Clean the content first to remove artifacts
+        clean_content = re.sub(r'---.*?---', '', content, flags=re.IGNORECASE)
+        clean_content = re.sub(r'##\s*', '', clean_content)
+        clean_content = re.sub(r'###\s*', '', clean_content)
+        
         # Look for objective markers
         patterns = [
             r'(?:objective|goal|aim|learn|understand)s?:?\s*(.+?)(?:\n|$)',
@@ -425,30 +437,30 @@ IMPORTANT GUIDELINES:
         ]
         
         for pattern in patterns:
-            matches = re.finditer(pattern, content, re.IGNORECASE)
+            matches = re.finditer(pattern, clean_content, re.IGNORECASE)
             for match in matches:
                 obj = match.group(1).strip()
-                if obj and 20 < len(obj) < 200:
+                # Clean the objective text
+                obj = re.sub(r'\s+', ' ', obj).strip()
+                # Skip if it contains artifacts or is too short/long
+                if (obj 
+                    and 20 < len(obj) < 200 
+                    and 'page_break' not in obj.lower() 
+                    and 'page break' not in obj.lower()
+                    and not obj.startswith('---')):
                     objectives.append(obj.capitalize())
         
         # Remove duplicates
         objectives = list(dict.fromkeys(objectives))
         
-        # If no objectives found, generate based on content
+        # If no objectives found, generate based on chapter title
         if not objectives:
-            # Generate from key sentences
-            sentences = re.split(r'[.!?]+', content)
-            important_sentences = [s.strip() for s in sentences if 30 < len(s.strip()) < 150][:3]
-            
             objectives = [
                 f"Understand the key concepts of {chapter.title}",
-                f"Apply knowledge of {chapter.subject.name} to solve problems",
+                f"Identify and explain important ideas related to {chapter.title}",
+                f"Apply knowledge to answer questions about {chapter.title}",
                 f"Demonstrate comprehension through practice exercises"
             ]
-            
-            # Add content-specific objective if possible
-            if important_sentences:
-                objectives.insert(0, f"Explain {important_sentences[0][:80].lower()}")
         
         return objectives[:5]
     
@@ -516,11 +528,33 @@ IMPORTANT GUIDELINES:
         """Structure content into logical, well-organized sections"""
         sections = []
         
-        # Check for existing headings in content
-        headings = re.findall(r'^(?:##|###)\s+(.+)$', full_content, re.MULTILINE)
+        # Check for existing headings in content (filter out artifacts)
+        raw_headings = re.findall(r'^(?:##|###)\s+(.+)$', full_content, re.MULTILINE)
+        headings = [
+            h.strip() for h in raw_headings 
+            if h.strip() 
+            and len(h.strip()) > 3
+            and not re.match(r'^[-_\s]*page[-_\s]*break[-_\s]*$', h, re.IGNORECASE)
+            and not re.match(r'^[-_]+$', h)
+            and not h.strip().startswith('---')
+        ]
         
-        # Create introduction from first substantial content
-        intro_content = paragraphs[0] if paragraphs else f"Welcome to this lesson on {chapter.title}."
+        # Filter out paragraphs that are just artifacts
+        clean_paragraphs = [
+            p for p in paragraphs 
+            if p.strip() 
+            and not re.match(r'^[-_\s]*page[-_\s]*break[-_\s]*$', p, re.IGNORECASE)
+            and len(p.strip()) > 30
+        ]
+        
+        if not clean_paragraphs:
+            clean_paragraphs = [f"Content for {chapter.title}"]
+        
+        # Extract first meaningful content for introduction
+        intro_content = clean_paragraphs[0] if clean_paragraphs else f"This lesson covers {chapter.title}."
+        # Clean the intro of any remaining artifacts
+        intro_content = re.sub(r'---.*?---', '', intro_content)
+        
         sections.append({
             'type': 'introduction',
             'title': 'Introduction',
@@ -531,9 +565,26 @@ IMPORTANT GUIDELINES:
         # Process remaining paragraphs into sections
         current_section_content = []
         section_counter = 1
+        heading_index = 0
         
-        for i, para in enumerate(paragraphs[1:], 1):
-            if len(para) < 30:
+        def get_section_title():
+            nonlocal heading_index
+            # Try to get a valid heading
+            while heading_index < len(headings):
+                candidate = headings[heading_index]
+                heading_index += 1
+                # Skip artifact headings
+                if (len(candidate) > 3 
+                    and not candidate.lower().startswith('page')
+                    and 'break' not in candidate.lower()
+                    and not candidate.startswith('---')):
+                    return candidate
+            # Generate a generic title if no valid heading found
+            return f'Section {section_counter}: Key Concepts'
+        
+        for i, para in enumerate(clean_paragraphs[1:], 1):
+            # Skip short or artifact paragraphs
+            if len(para) < 30 or re.match(r'^[-_\s]*$', para):
                 continue
                 
             # Detect section type
@@ -544,7 +595,7 @@ IMPORTANT GUIDELINES:
                 if current_section_content:
                     sections.append({
                         'type': 'explanation',
-                        'title': headings[section_counter-1] if section_counter <= len(headings) else f'Understanding {chapter.title}',
+                        'title': get_section_title(),
                         'content': '\n\n'.join(current_section_content),
                         'order': section_counter
                     })
@@ -559,7 +610,17 @@ IMPORTANT GUIDELINES:
                 })
                 section_counter += 1
                 
-            elif any(word in para_lower for word in ['exercise', 'practice', 'try this', 'solve', 'calculate']):
+            elif any(word in para_lower for word in ['exercise', 'practice', 'try this', 'solve', 'calculate', 'activity']):
+                if current_section_content:
+                    sections.append({
+                        'type': 'explanation',
+                        'title': get_section_title(),
+                        'content': '\n\n'.join(current_section_content),
+                        'order': section_counter
+                    })
+                    section_counter += 1
+                    current_section_content = []
+                    
                 sections.append({
                     'type': 'practice',
                     'title': 'Practice Activity',
@@ -575,7 +636,7 @@ IMPORTANT GUIDELINES:
                 if len(current_section_content) >= 3 or sum(len(p) for p in current_section_content) > 1000:
                     sections.append({
                         'type': 'explanation',
-                        'title': headings[section_counter-1] if section_counter <= len(headings) else f'Section {section_counter}: Key Concepts',
+                        'title': get_section_title(),
                         'content': '\n\n'.join(current_section_content),
                         'order': section_counter
                     })
@@ -586,18 +647,29 @@ IMPORTANT GUIDELINES:
         if current_section_content:
             sections.append({
                 'type': 'explanation',
-                'title': f'Additional Information',
+                'title': 'Additional Concepts',
                 'content': '\n\n'.join(current_section_content),
                 'order': section_counter
             })
             section_counter += 1
         
-        # Add summary section
-        summary_points = [s['title'] for s in sections if s['type'] == 'explanation'][:4]
+        # Add summary section - filter out artifact titles from summary points
+        summary_points = [
+            s['title'] for s in sections 
+            if s['type'] == 'explanation' 
+            and s['title'] not in ['Additional Concepts', 'Additional Information']
+            and 'page' not in s['title'].lower()
+            and 'break' not in s['title'].lower()
+        ][:4]
+        
+        summary_text = f"In this lesson, you learned about {chapter.title}."
+        if summary_points:
+            summary_text += "\n\nKey topics covered:\n• " + '\n• '.join(summary_points)
+        
         sections.append({
             'type': 'summary',
             'title': 'Summary',
-            'content': f"In this lesson, you learned about {chapter.title}.\n\nKey topics covered:\n• " + '\n• '.join(summary_points) if summary_points else f"This lesson covered the essential concepts of {chapter.title}.",
+            'content': summary_text,
             'order': section_counter
         })
         
@@ -684,21 +756,63 @@ IMPORTANT GUIDELINES:
         return questions[:8]
     
     def _extract_title(self, content: str) -> str:
-        """Extract or generate a title from content"""
+        """Extract or generate a title from content by finding meaningful headings"""
         lines = content.split('\n')
-        for line in lines[:5]:
-            if line.strip() and len(line.strip()) < 100:
-                return line.strip()
+        
+        # Look for markdown headings first
+        for line in lines:
+            stripped = line.strip()
+            # Check for markdown heading
+            match = re.match(r'^#{1,3}\s+(.+)$', stripped)
+            if match:
+                title = match.group(1).strip()
+                # Skip artifacts
+                if (len(title) > 5 
+                    and 'page' not in title.lower() 
+                    and 'break' not in title.lower()
+                    and not title.startswith('---')):
+                    return title
+        
+        # Look for short, significant lines that might be titles
+        for line in lines[:10]:
+            stripped = line.strip()
+            # Skip empty lines and artifacts
+            if not stripped or len(stripped) < 5:
+                continue
+            if stripped.startswith('---') or 'page' in stripped.lower():
+                continue
+            # Good candidate: short, title-case or all caps
+            if len(stripped) < 80 and (stripped.istitle() or stripped.isupper()):
+                return stripped.title() if stripped.isupper() else stripped
+        
         return "New Lesson"
     
     def _generate_introduction(self, paragraphs: List[str], chapter: TextbookChapter) -> str:
-        """Generate an engaging introduction"""
-        if not paragraphs:
-            return f"Welcome to this lesson on {chapter.subject.name}."
+        """Generate an engaging introduction from actual content"""
+        # Filter out artifact paragraphs
+        clean_paras = [
+            p for p in paragraphs 
+            if p.strip() 
+            and len(p.strip()) > 50
+            and not re.match(r'^[-_\s]*page[-_\s]*break[-_\s]*$', p, re.IGNORECASE)
+            and not p.strip().startswith('---')
+        ]
         
-        first_para = paragraphs[0]
-        if len(first_para) > 300:
-            first_para = first_para[:300] + "..."
+        if not clean_paras:
+            return f"Welcome to this lesson on {chapter.title}. In this lesson, you will learn about important concepts in {chapter.subject.name}."
+        
+        # Clean the first paragraph of artifacts
+        first_para = clean_paras[0]
+        first_para = re.sub(r'---.*?---', '', first_para).strip()
+        first_para = re.sub(r'\s+', ' ', first_para)
+        
+        if len(first_para) > 350:
+            # Try to cut at a sentence boundary
+            sentences = first_para[:400].split('.')
+            if len(sentences) > 1:
+                first_para = '.'.join(sentences[:-1]) + '.'
+            else:
+                first_para = first_para[:350] + "..."
         
         intro = f"In this lesson, we'll explore {chapter.title}. {first_para}"
         return intro[:500]
