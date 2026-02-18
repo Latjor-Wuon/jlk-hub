@@ -2,6 +2,8 @@ Django>=5.1.5
 djangorestframework>=3.15.0
 django-cors-headers>=4.6.0
 Pillow>=11.0.0
+gunicorn==25.1.0
+whitenoise==6.11.0
 
 # AI/ML Dependencies for Lesson Generation
 transformers>=4.36.0
