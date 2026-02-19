@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: jln-hub
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "cd backend && gunicorn jln_hub.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: False
+      - key: OPENAI_API_KEY
+        sync: false  # Set this in Render dashboard
+      - key: RENDER_EXTERNAL_URL
+        sync: false  # Render sets this automatically
+    healthCheckPath: /api/system/health/

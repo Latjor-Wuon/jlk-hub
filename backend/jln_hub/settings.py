@@ -12,7 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dev-key-change-in-production-jln-hub-2026'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+# Default to True for local development, False in production
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -103,10 +104,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Static files directories (for development - Django automatically finds files here)
+# In production, collectstatic copies these to STATIC_ROOT
 STATICFILES_DIRS = [
     BASE_DIR.parent / 'frontend' / 'src',
     BASE_DIR.parent / 'frontend',
 ]
+
+# WhiteNoise configuration (version 6.x)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Media files
 MEDIA_URL = '/media/'
@@ -115,12 +129,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS settings for frontend development
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # For development - restrict in production
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF settings
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+# CSRF settings - add your production domain to CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000', 
+    'http://127.0.0.1:8000',
+    # Add your Render URL: 'https://your-app.onrender.com'
+]
+
+# Get Render external URL from environment
+RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
+if RENDER_EXTERNAL_URL:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_URL}')
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_URL)
+
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF token
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
@@ -138,5 +163,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# OpenAI API Key (for AI lesson generation in production)
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', None)
 

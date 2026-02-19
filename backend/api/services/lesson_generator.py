@@ -17,8 +17,10 @@ from api.models import (
 )
 
 # Check if transformers is available (optional dependency)
+# NOTE: We do NOT import pipeline here to avoid memory issues on low-memory servers
+# Pipeline is imported lazily only when needed
 try:
-    from transformers import pipeline
+    import transformers
     TRANSFORMERS_AVAILABLE = True
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
@@ -35,36 +37,51 @@ class LessonGeneratorService:
     """
     Service for generating interactive lessons from textbook content.
     Uses AI models during content preparation phase, then stores results locally.
+    
+    IMPORTANT FOR PRODUCTION DEPLOYMENT:
+    - On low-memory servers (e.g., Render free tier with ~512MB RAM), use OpenAI API (use_openai=True)
+    - Local transformers models are lazy-loaded only when needed to avoid startup crashes
+    - For production, set OPENAI_API_KEY and use_openai=True to avoid memory issues
+    - Local models require significant RAM (1GB+) and will crash on free hosting tiers
     """
     
-    def __init__(self, use_openai: bool = False):
+    def __init__(self, use_openai: bool = None):
         """
         Initialize the lesson generator.
         
         Args:
-            use_openai: If True and available, use OpenAI API. Otherwise use local models.
+            use_openai: If True, use OpenAI API. If False, use local models.
+                       If None (default), auto-detect based on OPENAI_API_KEY availability.
         """
+        # Auto-detect: prefer OpenAI if API key is available (safer for production)
+        if use_openai is None:
+            use_openai = OPENAI_AVAILABLE and getattr(settings, 'OPENAI_API_KEY', None) is not None
+        
         self.use_openai = use_openai and OPENAI_AVAILABLE
         self.model_name = None
-        self.summarizer = None
-        self.qa_generator = None
-        
-        if not self.use_openai and TRANSFORMERS_AVAILABLE:
-            self._initialize_local_models()
+        self._summarizer = None
+        self._qa_generator = None
+        # DO NOT initialize models here - lazy load only when needed
     
-    def _initialize_local_models(self):
-        """Initialize local Hugging Face models for offline use"""
-        try:
-            # Using smaller models suitable for educational content
-            self.model_name = "facebook/bart-large-cnn"
-            # These models will be downloaded once and cached locally
-            self.summarizer = pipeline(
-                "summarization", 
-                model="facebook/bart-large-cnn",
-                device=-1  # Use CPU
-            )
-        except Exception as e:
-            print(f"Warning: Could not initialize local models: {e}")
+    def _get_summarizer(self):
+        """
+        Lazy load the summarizer model only when actually needed.
+        This prevents memory crashes on startup in low-memory environments.
+        """
+        if self._summarizer is None and not self.use_openai and TRANSFORMERS_AVAILABLE:
+            try:
+                # Using smaller models suitable for educational content
+                self.model_name = "facebook/bart-large-cnn"
+                # These models will be downloaded once and cached locally
+                from transformers import pipeline
+                self._summarizer = pipeline(
+                    "summarization", 
+                    model="facebook/bart-large-cnn",
+                    device=-1  # Use CPU
+                )
+            except Exception as e:
+                print(f"Warning: Could not initialize local models: {e}")
+        return self._summarizer
     
     def _call_openai(self, prompt: str, system_prompt: str = None, max_tokens: int = 2500) -> str:
         """Call OpenAI API for content generation with improved prompting"""

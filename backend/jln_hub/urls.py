@@ -14,6 +14,7 @@ urlpatterns = [
 ]
 
 # Serve media files in development
+# Note: Static files are automatically served by Django's staticfiles app when DEBUG=True
+# from STATICFILES_DIRS (no need to manually add static file serving)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
