@@ -137,10 +137,20 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000', 
     'http://127.0.0.1:8000',
-    # Add your Render URL: 'https://your-app.onrender.com'
 ]
 
-# Get Render external URL from environment
+# Railway-specific configuration
+RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT')
+if RAILWAY_ENVIRONMENT:
+    # Railway provides PUBLIC_DOMAIN or RAILWAY_PUBLIC_DOMAIN
+    railway_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN') or os.environ.get('PUBLIC_DOMAIN')
+    if railway_domain:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{railway_domain}')
+        ALLOWED_HOSTS.append(railway_domain)
+        # Also allow the .railway.app domain
+        CSRF_TRUSTED_ORIGINS.append(f'https://*.railway.app')
+
+# Render-specific configuration (fallback support)
 RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
 if RENDER_EXTERNAL_URL:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_URL}')
