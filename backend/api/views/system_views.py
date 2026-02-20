@@ -152,10 +152,18 @@ def system_health(request):
     """
     Basic system health check (public endpoint)
     Resilient to database issues - returns basic health even if DB fails
+    Used by Railway for deployment health checks from healthcheck.railway.app
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    # Log the health check request
+    logger.info(f"Health check request from: {request.META.get('HTTP_HOST', 'unknown')}")
+    
     health = {
         'status': 'healthy',
         'timestamp': timezone.now().isoformat(),
+        'host': request.META.get('HTTP_HOST', 'unknown'),
     }
     
     # Try to check database, but don't fail if it's not available
@@ -172,10 +180,12 @@ def system_health(request):
             'grades': Grade.objects.count(),
             'lessons': CurriculumCapsule.objects.count()
         }
+        logger.info("Health check: Database connected successfully")
     except Exception as e:
         # Database not available yet, but app is still healthy
         health['database'] = 'not_ready'
         health['database_error'] = str(e)
+        logger.warning(f"Health check: Database not ready - {str(e)}")
         # Still return 200 OK so Railway doesn't think app is unhealthy
     
-    return Response(health)
+    return Response(health, status=200)

@@ -19,7 +19,15 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 # Default to True for local development, False in production
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["*"]  # Temporarily allow all for Railway deployment testing
+# IMPORTANT: Railway uses 'healthcheck.railway.app' hostname for health checks
+ALLOWED_HOSTS = [
+    "*",  # Allow all (for development)
+    "healthcheck.railway.app",  # Railway healthcheck hostname
+    "localhost",
+    "127.0.0.1",
+    ".railway.app",  # All railway subdomains
+    ".up.railway.app",  # New railway domains
+]
 
 
 
