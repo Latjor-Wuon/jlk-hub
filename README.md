@@ -205,7 +205,6 @@ JLN Hub/
 - ✅ Publishing to CurriculumCapsules
 - ✅ Admin interface with status tracking
 - ✅ Locally stored lessons for offline access
-- 📚 **See [AI_LESSON_GENERATION.md](AI_LESSON_GENERATION.md) for detailed documentation**
 
 ### Feature 3: Embedded Quizzes and Instant Feedback
 - ✅ Multiple question types (multiple choice, true/false)
