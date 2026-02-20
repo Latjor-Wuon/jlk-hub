@@ -119,10 +119,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Static files directories (for development - Django automatically finds files here)
 # In production, collectstatic copies these to STATIC_ROOT
-STATICFILES_DIRS = [
-    BASE_DIR.parent / 'frontend' / 'src',
-    BASE_DIR.parent / 'frontend',
-]
+# Only add directories that exist to avoid warnings in production
+STATICFILES_DIRS = []
+frontend_src_path = BASE_DIR.parent / 'frontend' / 'src'
+frontend_path = BASE_DIR.parent / 'frontend'
+if frontend_src_path.exists():
+    STATICFILES_DIRS.append(frontend_src_path)
+if frontend_path.exists() and frontend_path not in STATICFILES_DIRS:
+    STATICFILES_DIRS.append(frontend_path)
 
 # WhiteNoise configuration (version 6.x)
 STORAGES = {
