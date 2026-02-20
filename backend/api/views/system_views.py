@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.conf import settings
+from django.utils import timezone
 
 
 @api_view(['GET'])
@@ -150,17 +151,31 @@ def ai_integration_status(request):
 def system_health(request):
     """
     Basic system health check (public endpoint)
+    Resilient to database issues - returns basic health even if DB fails
     """
-    from api.models import Subject, Grade, CurriculumCapsule
-    
     health = {
         'status': 'healthy',
-        'database': 'connected',
-        'stats': {
+        'timestamp': timezone.now().isoformat(),
+    }
+    
+    # Try to check database, but don't fail if it's not available
+    try:
+        from api.models import Subject, Grade, CurriculumCapsule
+        from django.db import connection
+        
+        # Test database connection
+        connection.ensure_connection()
+        
+        health['database'] = 'connected'
+        health['stats'] = {
             'subjects': Subject.objects.count(),
             'grades': Grade.objects.count(),
             'lessons': CurriculumCapsule.objects.count()
         }
-    }
+    except Exception as e:
+        # Database not available yet, but app is still healthy
+        health['database'] = 'not_ready'
+        health['database_error'] = str(e)
+        # Still return 200 OK so Railway doesn't think app is unhealthy
     
     return Response(health)
