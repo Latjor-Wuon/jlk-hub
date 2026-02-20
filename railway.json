@@ -2,7 +2,19 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "./build.sh"
+    "buildCommand": "./build.sh",
+    "watchPatterns": [
+      "backend/**/*.py",
+      "frontend/**/*.js",
+      "frontend/**/*.html",
+      "frontend/**/*.css",
+      "requirements.txt",
+      "backend/requirements.txt",
+      "Procfile",
+      "build.sh",
+      "runtime.txt",
+      "railway.json"
+    ]
   },
   "deploy": {
     "startCommand": "cd backend && gunicorn jln_hub.wsgi:application",
