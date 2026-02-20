@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "./build.sh",
+    "buildCommand": "bash build.sh",
     "watchPatterns": [
       "backend/**/*.py",
       "frontend/**/*.js",
@@ -17,7 +17,7 @@
     ]
   },
   "deploy": {
-    "startCommand": "cd backend && gunicorn jln_hub.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --log-level info",
+    "startCommand": "if [ -f manage.py ]; then gunicorn jln_hub.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --log-level info; else cd backend && gunicorn jln_hub.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --log-level info; fi",
     "healthcheckPath": "/api/system/health/",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",

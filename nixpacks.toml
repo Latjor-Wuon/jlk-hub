@@ -1,0 +1,9 @@
+# Tell Nixpacks where the Django project is located
+[phases.setup]
+nixPkgs = ["python311", "postgresql"]
+
+[phases.install]
+cmds = ["bash build.sh"]
+
+[start]
+cmd = "if [ -f manage.py ]; then gunicorn jln_hub.wsgi:application --bind 0.0.0.0:${PORT:-8000}; else cd backend && gunicorn jln_hub.wsgi:application --bind 0.0.0.0:${PORT:-8000}; fi"
