@@ -60,10 +60,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'jln_hub.urls'
 
+# Template directories - now inside backend for Railway deployment
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR.parent / 'frontend'],
+        'DIRS': [BASE_DIR / 'jln_hub' / 'templates'],  # Frontend templates inside backend
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,16 +118,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Static files directories (for development - Django automatically finds files here)
-# In production, collectstatic copies these to STATIC_ROOT
-# Only add directories that exist to avoid warnings in production
-STATICFILES_DIRS = []
-frontend_src_path = BASE_DIR.parent / 'frontend' / 'src'
-frontend_path = BASE_DIR.parent / 'frontend'
-if frontend_src_path.exists():
-    STATICFILES_DIRS.append(frontend_src_path)
-if frontend_path.exists() and frontend_path not in STATICFILES_DIRS:
-    STATICFILES_DIRS.append(frontend_path)
+# Static files directories - now inside backend for Railway deployment
+# Frontend JS/CSS files are in backend/jln_hub/static/
+STATICFILES_DIRS = [
+    BASE_DIR / 'jln_hub' / 'static',  # Frontend static files inside backend
+]
 
 # WhiteNoise configuration (version 6.x)
 STORAGES = {

@@ -130,6 +130,9 @@ class APIClient {
 
 export const apiClient = new APIClient();
 
+// Export as 'api' for backward compatibility
+export const api = apiClient;
+
 // Wrapper function for API requests that matches the expected signature
 export async function apiRequest(url, method = 'GET', data = null) {
     const endpoint = url.startsWith('/api') ? url.substring(4) : url;

@@ -47,8 +47,8 @@ export class LessonGeneratorPage {
                 <div class="message-card">
                     <h2>🔒 Access Restricted</h2>
                     <p>This page is only available to administrators and content creators.</p>
-                    <p>Please <a href="src/pages/login.html" class="link">login</a> with an admin account to access the AI Lesson Generator.</p>
-                    <button class="btn btn-primary" onclick="window.location.href='home.html'">
+                    <p>Please <a href="/pages/login.html" class="link">login</a> with an admin account to access the AI Lesson Generator.</p>
+                    <button class="btn btn-primary" onclick="window.location.href='/home.html'">
                         ← Back to Home
                     </button>
                 </div>

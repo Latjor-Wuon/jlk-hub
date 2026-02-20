@@ -2,6 +2,15 @@
 
 An offline-first educational application designed to deliver South Sudan's national curriculum to primary and secondary school learners, regardless of internet availability or infrastructure constraints.
 
+## Architecture
+
+JLN Hub is built as a **Django monorepo** where both backend API and frontend are integrated into a single Django application. This architecture provides:
+- Unified deployment (single service to deploy)
+- Simplified static file handling with WhiteNoise
+- Django template system for HTML pages
+- Modular JavaScript with ES6 modules
+- Component-based frontend architecture
+
 ## Project Description
 
 JLN Hub is a full-stack learning platform that packages curriculum lessons, assessments, guided practice, and learning feedback into a single application. The platform features:
@@ -16,16 +25,20 @@ JLN Hub is a full-stack learning platform that packages curriculum lessons, asse
 ## Technology Stack
 
 ### Backend
-- Django 5.0.1
-- Django REST Framework 3.14.0
+- Django 5.0.6
+- Django REST Framework 3.15.1
 - SQLite (offline-first database)
 - Django CORS Headers
+- WhiteNoise (static file serving)
+- PyPDF2 & pdfplumber (PDF processing)
+- OpenAI/OpenRouter API (AI lesson generation)
 
-### Frontend
-- Vanilla JavaScript (ES6+)
-- HTML5
+### Frontend (Integrated with Django)
+- Vanilla JavaScript (ES6+ modules)
+- HTML5 templates served by Django
 - CSS3 with CSS Grid & Flexbox
 - Responsive Design
+- Component-based architecture
 
 ## Project Structure
 
@@ -36,28 +49,80 @@ JLN Hub/
 │   │   ├── settings.py
 │   │   ├── urls.py
 │   │   ├── wsgi.py
-│   │   └── asgi.py
+│   │   ├── asgi.py
+│   │   ├── templates/        # HTML templates
+│   │   │   ├── *.html        # Main pages
+│   │   │   └── pages/        # Auth pages (login, register)
+│   │   └── static/           # Frontend static files
+│   │       ├── app.js
+│   │       ├── index.js
+│   │       ├── styles.css
+│   │       ├── components/   # Reusable UI components
+│   │       ├── pages/        # Page-specific JavaScript modules
+│   │       └── utils/        # Utility functions (API, helpers)
 │   ├── api/                  # REST API application
 │   │   ├── models.py         # Database models
-│   │   ├── serializers.py    # API serializers
-│   │   ├── views.py          # API endpoints
+│   │   ├── serializers/      # API serializers (modular)
+│   │   ├── views/            # API endpoints (modular)
+│   │   ├── services/         # Business logic (AI, PDF processing)
 │   │   ├── urls.py           # API routing
 │   │   └── admin.py          # Admin interface
 │   ├── manage.py
-│   └── requirements.txt
-└── frontend/
-    ├── index.html            # Main HTML file
-    └── src/
-        ├── app.js            # Application logic
-        └── styles.css        # Styling
+│   ├── requirements.txt
+│   └── db.sqlite3            # SQLite database
+├── doc/                      # Project documentation
+├── assets/                   # Screenshots and media
+└── railway.json              # Railway deployment config
 ```
+
 **GitHub repo links**
    - Main repo: https://github.com/Latjor-Wuon/jlk-hub
-   - Frontend: https://github.com/Latjor-Wuon/jlk-hub/tree/master/frontend
-   - Backend: https://github.com/Latjor-Wuon/jlk-hub/tree/master/backend
-   - Demo&screenshoots: https://github.com/Latjor-Wuon/jlk-hub/tree/master/assets
+   - Backend API: https://github.com/Latjor-Wuon/jlk-hub/tree/master/backend
+   - Demo & Screenshots: https://github.com/Latjor-Wuon/jlk-hub/tree/master/assets
+
+## File Organization
+
+### Templates (HTML)
+Located in `backend/jln_hub/templates/`:
+- Main pages: `home.html`, `subjects.html`, `lessons.html`, `quizzes.html`, etc.
+- Auth pages: `pages/login.html`, `pages/register.html`
+
+### Static Files (CSS, JS)
+Located in `backend/jln_hub/static/`:
+- **Stylesheets**: `styles.css`
+- **Page Modules**: `pages/HomePage.js`, `pages/SubjectsPage.js`, etc.
+- **Components**: `components/auth.js`, `components/Navigation.js`, etc.
+- **Utilities**: `utils/api.js`, `utils/common.js`, `utils/helpers.js`
+
+### API Code
+Located in `backend/api/`:
+- **Models**: `models.py` (database schemas)
+- **Views**: `views/` (API endpoints by feature)
+- **Serializers**: `serializers/` (data transformation)
+- **Services**: `services/` (business logic, AI processing)
    
 ## Setup Instructions
+
+### Quick Start
+
+```bash
+# Navigate to backend directory
+cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run migrations
+python manage.py migrate
+
+# Create admin user
+python manage.py createsuperuser
+
+# Start server
+python manage.py runserver
+
+# Visit http://localhost:8000/
+```
 
 ### Prerequisites
 - Python 3.10 or higher
@@ -115,8 +180,11 @@ JLN Hub/
    ```
 
 9. **Access the application**
-   - Frontend: http://localhost:8000/
-   - API: http://localhost:8000/api/
+   - Homepage: http://localhost:8000/ (redirects to home.html)
+   - Main App: http://localhost:8000/home.html
+   - Login: http://localhost:8000/pages/login.html
+   - Register: http://localhost:8000/pages/register.html
+   - API Root: http://localhost:8000/api/
    - Admin Panel: http://localhost:8000/admin/
   
 
@@ -300,7 +368,9 @@ python manage.py generate_lessons --all --max-chapters 10
 - **New API endpoints**: Add views in `backend/api/views/` and update `backend/api/urls.py`
 - **New models**: Define in `backend/api/models.py`, then run migrations
 - **New serializers**: Create in `backend/api/serializers/`
-- **Frontend features**: Add pages in `frontend/src/pages/` and components in `frontend/src/components/`
+- **Frontend pages**: Add HTML in `backend/jln_hub/templates/` and JavaScript modules in `backend/jln_hub/static/pages/`
+- **UI components**: Create reusable components in `backend/jln_hub/static/components/`
+- **Static assets**: Add CSS, images, and JS utilities in `backend/jln_hub/static/`
 
 ## Testing
 
@@ -309,7 +379,23 @@ Run Django tests:
 python manage.py test
 ```
 
-## Deployment Plan
+## Deployment
+
+### Production Deployment (Railway)
+
+The application is configured for Railway deployment with:
+- `railway.json` for deployment configuration
+- WhiteNoise for static file serving
+- Environment-based settings for DEBUG, SECRET_KEY
+- Health check endpoint at `/api/system/health/`
+
+**Deploy to Railway:**
+1. Connect your GitHub repository to Railway
+2. Set environment variables:
+   - `DEBUG=False`
+   - `SECRET_KEY=<your-secret-key>`
+   - `OPENROUTER_API_KEY=<optional-for-ai-features>`
+3. Railway will automatically detect Django and deploy
 
 ### Local/Offline Deployment
 1. Package the application with all dependencies
@@ -317,17 +403,17 @@ python manage.py test
 3. Distribute as a standalone package
 4. Consider using tools like PyInstaller for executable creation
 
-### Cloud Deployment Options
+### Other Cloud Deployment Options
 - **Heroku**: Simple deployment with Django support
-- **Railway**: Modern platform with easy setup
+- **Render**: Free tier with automatic deploys
 - **PythonAnywhere**: Free tier for development
 - **AWS/Azure**: For production scale
 
-### Offline-First Features (Planned)
-- Service Workers for caching
-- IndexedDB for local data storage
-- Background sync for progress updates
-- Installable as Progressive Web App (PWA)
+### Offline-First Features
+- SQLite database for local data storage
+- Django templates cached by browser
+- Static files served efficiently with WhiteNoise
+- No external dependencies required once installed
 
 ## Contributing
 
@@ -340,6 +426,15 @@ Educational Project - 2026
 ## Contact
 
 For questions or support regarding this project, please contact the development team.
+
+---
+
+**Recent Updates (February 2026)**:
+- Restructured project as Django monorepo for simplified deployment
+- Moved all frontend files into Django's template and static structure
+- Integrated WhiteNoise for efficient static file serving
+- Configured for one-click Railway deployment
+- Maintained offline-first architecture with SQLite
 
 ---
 

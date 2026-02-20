@@ -103,7 +103,7 @@ export class ProgressPage {
                             <span>Continue where you left off</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="window.location.href='src/pages/login.html'">
+                    <button class="btn btn-primary" onclick="window.location.href='/pages/login.html'">
                         Sign In to Track Progress
                     </button>
                 </div>
@@ -325,7 +325,7 @@ export class ProgressPage {
         return `
             <div class="auth-required">
                 <p>Please sign in to view this content.</p>
-                <button class="btn btn-primary" onclick="window.location.href='src/pages/login.html'">
+                <button class="btn btn-primary" onclick="window.location.href='/pages/login.html'">
                     Sign In
                 </button>
             </div>

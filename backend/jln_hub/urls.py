@@ -27,9 +27,9 @@ urlpatterns = [
     path('admin-dashboard.html', template_view('admin-dashboard.html'), name='admin-dashboard'),
     path('lesson-generator.html', template_view('lesson-generator.html'), name='lesson-generator'),
     
-    # Auth pages (in src/pages/)
-    path('src/pages/login.html', template_view('src/pages/login.html'), name='login'),
-    path('src/pages/register.html', template_view('src/pages/register.html'), name='register'),
+    # Auth pages (in pages/ subdirectory)
+    path('pages/login.html', template_view('pages/login.html'), name='login'),
+    path('pages/register.html', template_view('pages/register.html'), name='register'),
 ]
 
 # Serve media files in development

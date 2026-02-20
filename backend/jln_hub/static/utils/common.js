@@ -22,7 +22,7 @@ export function initAuthUI() {
         // Add logout handler
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await authManager.logout();
-            window.location.href = 'home.html';
+            window.location.href = '/home.html';
         });
         
         // Show admin menu if user is staff
@@ -36,8 +36,8 @@ export function initAuthUI() {
         }
     } else {
         navAuthContainer.innerHTML = `
-            <a href="src/pages/login.html" class="btn btn-primary btn-sm">Login</a>
-            <a href="src/pages/register.html" class="btn btn-secondary btn-sm">Register</a>
+            <a href="/pages/login.html" class="btn btn-primary btn-sm">Login</a>
+            <a href="/pages/register.html" class="btn btn-secondary btn-sm">Register</a>
         `;
     }
 }

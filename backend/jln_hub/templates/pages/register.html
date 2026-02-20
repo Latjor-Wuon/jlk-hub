@@ -15,10 +15,10 @@
                 <p class="tagline">Offline-First Learning Platform</p>
             </div>
             <ul class="nav-menu">
-                <li><a href="../home.html" class="nav-link">Home</a></li>
-                <li><a href="../subjects.html" class="nav-link">Subjects</a></li>
-                <li><a href="../quizzes.html" class="nav-link">Quizzes</a></li>
-                <li><a href="../simulations.html" class="nav-link">Simulations</a></li>
+                <li><a href="/home.html" class="nav-link">Home</a></li>
+                <li><a href="/subjects.html" class="nav-link">Subjects</a></li>
+                <li><a href="/quizzes.html" class="nav-link">Quizzes</a></li>
+                <li><a href="/simulations.html" class="nav-link">Simulations</a></li>
             </ul>
         </div>
     </nav>
@@ -83,7 +83,7 @@
                     </form>
                     
                     <p class="auth-switch">
-                        Already have an account? <a href="login.html">Login here</a>
+                        Already have an account? <a href="/pages/login.html">Login here</a>
                     </p>
                 </div>
             </div>
@@ -156,7 +156,7 @@
             const result = await authManager.register(formData);
             
             if (result.success) {
-                window.location.href = '../home.html';
+                window.location.href = '/home.html';
             } else {
                 errorEl.textContent = result.error || 'Registration failed. Please try again.';
                 errorEl.style.display = 'block';
