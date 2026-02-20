@@ -295,10 +295,6 @@ python manage.py generate_lessons --all --max-chapters 10
 - `--auto-publish`: Automatically publish generated lessons
 - `--max-chapters N`: Limit number of chapters to process
 
-**🆓 Free AI Option:** Set up OpenRouter for free AI-powered lesson generation. See [OPENROUTER_SETUP.md](OPENROUTER_SETUP.md)
-
-For more details, see [AI_LESSON_GENERATION.md](AI_LESSON_GENERATION.md)
-
 ### Extending the Application
 
 - **New API endpoints**: Add views in `backend/api/views/` and update `backend/api/urls.py`
