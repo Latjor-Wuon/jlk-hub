@@ -291,10 +291,12 @@ python manage.py generate_lessons --all --max-chapters 10
 - `--chapter-id ID`: Generate for specific chapter
 - `--subject NAME`: Filter by subject
 - `--grade NAME`: Filter by grade
-- `--use-openai`: Use OpenAI API (requires OPENAI_API_KEY in settings)
+- `--use-openai`: Use AI API (requires OPENROUTER_API_KEY or OPENAI_API_KEY)
 - `--validate-only`: Validate without generating
 - `--auto-publish`: Automatically publish generated lessons
 - `--max-chapters N`: Limit number of chapters to process
+
+**🆓 Free AI Option:** Set up OpenRouter for free AI-powered lesson generation. See [OPENROUTER_SETUP.md](OPENROUTER_SETUP.md)
 
 For more details, see [AI_LESSON_GENERATION.md](AI_LESSON_GENERATION.md)
 

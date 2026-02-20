@@ -411,8 +411,9 @@ export function AdminDashboardPage() {
         </style>
     `;
 
-    // Load dashboard data
-    loadDashboardData();
+    // Don't load dashboard data immediately - let the caller do it after appending to DOM
+    // This is stored on the container for later access
+    container._loadDashboardData = loadDashboardData;
 
     // Event listeners
     container.querySelector('#refreshBtn').addEventListener('click', loadDashboardData);
@@ -432,28 +433,38 @@ async function loadDashboardData() {
     if (dashboardContent) dashboardContent.style.display = 'none';
 
     try {
+        // Get authentication token
+        const token = localStorage.getItem('jln_token');
+        
         // Fetch admin stats and users data
         const [statsResponse, usersResponse] = await Promise.all([
             fetch(`${API_BASE_URL}/dashboard/admin_stats/`, {
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token ? `Token ${token}` : ''
                 }
             }),
             fetch(`${API_BASE_URL}/dashboard/users/`, {
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token ? `Token ${token}` : ''
                 }
             })
         ]);
 
         if (!statsResponse.ok || !usersResponse.ok) {
+            console.error('Stats response:', statsResponse.status, await statsResponse.text());
+            console.error('Users response:', usersResponse.status, await usersResponse.text());
             throw new Error('Failed to fetch dashboard data');
         }
 
         const stats = await statsResponse.json();
         const usersData = await usersResponse.json();
+
+        console.log('Admin stats loaded:', stats);
+        console.log('Recent quiz attempts:', stats.recent_quiz_attempts);
 
         // Update statistics cards
         updateStatistics(stats);
@@ -631,18 +642,23 @@ function updateUsersTable(users) {
 
 function updateRecentActivity(attempts) {
     const activityContainer = document.getElementById('recentActivity');
-    if (!activityContainer) return;
+    if (!activityContainer) {
+        console.warn('Recent activity container not found');
+        return;
+    }
 
-    if (attempts.length === 0) {
-        activityContainer.innerHTML = '<p style="color: #7f8c8d; text-align: center;">No recent activity</p>';
+    console.log('Updating recent activity with:', attempts);
+
+    if (!attempts || attempts.length === 0) {
+        activityContainer.innerHTML = '<p style="color: #7f8c8d; text-align: center;">No recent quiz attempts</p>';
         return;
     }
 
     activityContainer.innerHTML = attempts.map(attempt => `
         <div class="activity-item">
             <div class="activity-info">
-                <strong>${attempt.learner__username}</strong> completed 
-                <span style="color: #3498db;">${attempt.quiz__title}</span>
+                <strong>${attempt.learner__username || 'Unknown User'}</strong> completed 
+                <span style="color: #3498db;">${attempt.quiz__title || 'Quiz'}</span>
                 <br>
                 <small style="color: #7f8c8d;">${new Date(attempt.completed_at).toLocaleString()}</small>
             </div>

@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from api.models import Quiz, QuizAttempt
@@ -21,12 +21,16 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = [AllowAny]
-    authentication_classes = [CsrfExemptSessionAuthentication]
+    authentication_classes = [TokenAuthentication, CsrfExemptSessionAuthentication]
     
     @action(detail=True, methods=['post'])
     def submit(self, request, pk=None):
         """Submit quiz answers and get results"""
         quiz = self.get_object()
+        
+        # Debug logging
+        print(f"Quiz submission - User: {request.user}, Authenticated: {request.user.is_authenticated}")
+        
         serializer = QuizSubmissionSerializer(data=request.data)
         
         if not serializer.is_valid():
@@ -61,7 +65,7 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
         
         # Save attempt if user is authenticated
         if request.user.is_authenticated:
-            QuizAttempt.objects.create(
+            attempt = QuizAttempt.objects.create(
                 learner=request.user,
                 quiz=quiz,
                 score=score,
@@ -69,6 +73,9 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
                 passed=passed,
                 answers=answers
             )
+            print(f"Quiz attempt saved: ID={attempt.id}, User={request.user.username}, Score={score}/{max_score}, Passed={passed}")
+        else:
+            print("Quiz attempt NOT saved - user not authenticated")
         
         return Response({
             'score': score,

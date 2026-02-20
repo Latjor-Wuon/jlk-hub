@@ -108,6 +108,8 @@ export class LessonsPage {
             
             if (lessons && lessons.length > 0) {
                 container.innerHTML = lessons.map(lesson => this.createLessonCard(lesson)).join('');
+                // Add click handlers
+                this.attachLessonClickListeners();
             } else {
                 container.innerHTML = '<p class="info-message">No lessons match your filters.</p>';
             }
@@ -135,6 +137,16 @@ export class LessonsPage {
                 </div>
             </div>
         `;
+    }
+    
+    attachLessonClickListeners() {
+        // Add click handlers to lesson cards
+        document.querySelectorAll('.lesson-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const lessonId = card.getAttribute('data-lesson-id');
+                window.location.href = `lesson-detail.html?id=${lessonId}`;
+            });
+        });
     }
 
     setFilters(subjectId, gradeId) {

@@ -1,63 +1,167 @@
-<!-- Register Page -->
-<div class="auth-container">
-    <div class="auth-card">
-        <h2>Register for JLN Hub</h2>
-        <p class="auth-subtitle">Create your learning account</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - JLN Hub</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🎓 JLN Hub</h1>
+                <p class="tagline">Offline-First Learning Platform</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../home.html" class="nav-link">Home</a></li>
+                <li><a href="../subjects.html" class="nav-link">Subjects</a></li>
+                <li><a href="../quizzes.html" class="nav-link">Quizzes</a></li>
+                <li><a href="../simulations.html" class="nav-link">Simulations</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h2>Register for JLN Hub</h2>
+                    <p class="auth-subtitle">Create your learning account</p>
+                    
+                    <form id="register-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="reg-username">Username *</label>
+                            <input type="text" id="reg-username" name="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reg-email">Email (optional)</label>
+                            <input type="email" id="reg-email" name="email">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reg-firstname">First Name</label>
+                                <input type="text" id="reg-firstname" name="first_name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reg-lastname">Last Name</label>
+                                <input type="text" id="reg-lastname" name="last_name">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reg-grade">Grade Level</label>
+                                <select id="reg-grade" name="grade">
+                                    <option value="">Select Grade</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reg-school">School Name</label>
+                                <input type="text" id="reg-school" name="school_name">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reg-password">Password *</label>
+                            <input type="password" id="reg-password" name="password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reg-password2">Confirm Password *</label>
+                            <input type="password" id="reg-password2" name="password2" required>
+                        </div>
+                        
+                        <div id="register-error" class="error-message" style="display: none;"></div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Register</button>
+                    </form>
+                    
+                    <p class="auth-switch">
+                        Already have an account? <a href="login.html">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Jinubia Learning Nexus Hub. Empowering learners in South Sudan.</p>
+            <p class="offline-indicator">
+                <span id="online-status">🟢 Online</span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/components/auth.js"></script>
+    <script type="module">
+        import { initCommon } from '/static/utils/common.js';
+        import { apiClient } from '/static/utils/api.js';
         
-        <form id="register-form" class="auth-form">
-            <div class="form-group">
-                <label for="reg-username">Username *</label>
-                <input type="text" id="reg-username" name="username" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="reg-email">Email (optional)</label>
-                <input type="email" id="reg-email" name="email">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="reg-firstname">First Name</label>
-                    <input type="text" id="reg-firstname" name="first_name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="reg-lastname">Last Name</label>
-                    <input type="text" id="reg-lastname" name="last_name">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="reg-grade">Grade Level</label>
-                    <select id="reg-grade" name="grade">
-                        <option value="">Select Grade</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="reg-school">School Name</label>
-                    <input type="text" id="reg-school" name="school_name">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="reg-password">Password *</label>
-                <input type="password" id="reg-password" name="password" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="reg-password2">Confirm Password *</label>
-                <input type="password" id="reg-password2" name="password2" required>
-            </div>
-            
-            <div id="register-error" class="error-message" style="display: none;"></div>
-            
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
-        </form>
+        // Initialize common UI
+        initCommon();
         
-        <p class="auth-switch">
-            Already have an account? <a href="#login">Login here</a>
-        </p>
-    </div>
-</div>
+        // Load grade options
+        async function loadGrades() {
+            const grades = await apiClient.get('/grades/');
+            const gradeSelect = document.getElementById('reg-grade');
+            if (grades && grades.results) {
+                grades.results.forEach(grade => {
+                    const option = document.createElement('option');
+                    option.value = grade.id;
+                    option.textContent = grade.name;
+                    gradeSelect.appendChild(option);
+                });
+            }
+        }
+        
+        loadGrades();
+        
+        // Handle register form submission
+        const authManager = window.AuthManager ? new window.AuthManager() : null;
+        
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('register-error');
+            
+            if (!authManager) {
+                errorEl.textContent = 'Authentication system not available.';
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            const formData = {
+                username: document.getElementById('reg-username').value,
+                email: document.getElementById('reg-email').value,
+                first_name: document.getElementById('reg-firstname').value,
+                last_name: document.getElementById('reg-lastname').value,
+                password: document.getElementById('reg-password').value,
+                password2: document.getElementById('reg-password2').value,
+                grade: document.getElementById('reg-grade').value,
+                school_name: document.getElementById('reg-school').value
+            };
+            
+            if (formData.password !== formData.password2) {
+                errorEl.textContent = 'Passwords do not match.';
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            const result = await authManager.register(formData);
+            
+            if (result.success) {
+                window.location.href = '../home.html';
+            } else {
+                errorEl.textContent = result.error || 'Registration failed. Please try again.';
+                errorEl.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

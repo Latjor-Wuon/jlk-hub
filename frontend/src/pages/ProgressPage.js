@@ -103,7 +103,7 @@ export class ProgressPage {
                             <span>Continue where you left off</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="window.location.hash='#login'">
+                    <button class="btn btn-primary" onclick="window.location.href='src/pages/login.html'">
                         Sign In to Track Progress
                     </button>
                 </div>
@@ -170,7 +170,7 @@ export class ProgressPage {
             if (!progress?.length) {
                 container.innerHTML = `
                     <p class="text-muted">Start a lesson to begin tracking your progress!</p>
-                    <a href="#lessons" class="btn btn-primary">Browse Lessons</a>
+                    <a href="lessons.html" class="btn btn-primary">Browse Lessons</a>
                 `;
                 return;
             }
@@ -209,7 +209,7 @@ export class ProgressPage {
                 contentDiv.innerHTML = `
                     <div class="empty-state">
                         <p>No lesson progress yet.</p>
-                        <a href="#lessons" class="btn btn-primary">Start Learning</a>
+                        <a href="lessons.html" class="btn btn-primary">Start Learning</a>
                     </div>
                 `;
                 return;
@@ -325,7 +325,7 @@ export class ProgressPage {
         return `
             <div class="auth-required">
                 <p>Please sign in to view this content.</p>
-                <button class="btn btn-primary" onclick="window.location.hash='#login'">
+                <button class="btn btn-primary" onclick="window.location.href='src/pages/login.html'">
                     Sign In
                 </button>
             </div>

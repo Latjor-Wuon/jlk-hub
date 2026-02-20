@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzes - JLN Hub</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🎓 JLN Hub</h1>
+                <p class="tagline">Offline-First Learning Platform</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="subjects.html" class="nav-link">Subjects</a></li>
+                <li><a href="quizzes.html" class="nav-link active">Quizzes</a></li>
+                <li><a href="simulations.html" class="nav-link">Simulations</a></li>
+                <li id="admin-nav-link" style="display: none;"><a href="admin-dashboard.html" class="nav-link">Dashboard</a></li>
+                <li id="lesson-gen-nav-link" style="display: none;"><a href="lesson-generator.html" class="nav-link">✨ AI Lessons</a></li>
+            </ul>
+            <div class="nav-auth" id="nav-auth">
+                <!-- Auth buttons will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div id="quizzes-page" class="page active">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Jinubia Learning Nexus Hub. Empowering learners in South Sudan.</p>
+            <p class="offline-indicator">
+                <span id="online-status">🟢 Online</span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/components/auth.js"></script>
+    <script type="module">
+        import { QuizzesPage } from '/static/pages/QuizzesPage.js';
+        import { initCommon } from '/static/utils/common.js';
+        
+        // Initialize common UI
+        initCommon();
+        
+        // Initialize quizzes page
+        const container = document.getElementById('quizzes-page');
+        const quizzesPage = new QuizzesPage(container);
+        await quizzesPage.render();
+    </script>
+</body>
+</html>

@@ -34,6 +34,11 @@ export class LessonGeneratorPage {
         
         const componentElement = await this.lessonGenComponent.render();
         this.container.appendChild(componentElement);
+        
+        // Load initial data after appending to DOM
+        if (componentElement._loadInitialData) {
+            componentElement._loadInitialData();
+        }
     }
 
     renderUnauthorized() {
@@ -42,8 +47,8 @@ export class LessonGeneratorPage {
                 <div class="message-card">
                     <h2>🔒 Access Restricted</h2>
                     <p>This page is only available to administrators and content creators.</p>
-                    <p>Please <a href="#login" class="link">login</a> with an admin account to access the AI Lesson Generator.</p>
-                    <button class="btn btn-primary" onclick="app.router.navigate('home')">
+                    <p>Please <a href="src/pages/login.html" class="link">login</a> with an admin account to access the AI Lesson Generator.</p>
+                    <button class="btn btn-primary" onclick="window.location.href='home.html'">
                         ← Back to Home
                     </button>
                 </div>

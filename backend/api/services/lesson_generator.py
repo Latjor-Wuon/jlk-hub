@@ -25,7 +25,7 @@ try:
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
-# Check if OpenAI is available (optional, for content preparation)
+# Check if OpenAI client library is available (works with both OpenAI and OpenRouter)
 try:
     import openai
     OPENAI_AVAILABLE = True
@@ -39,9 +39,10 @@ class LessonGeneratorService:
     Uses AI models during content preparation phase, then stores results locally.
     
     IMPORTANT FOR PRODUCTION DEPLOYMENT:
-    - On low-memory servers (e.g., Render free tier with ~512MB RAM), use OpenAI API (use_openai=True)
+    - On low-memory servers (e.g., Render free tier with ~512MB RAM), use AI API (use_openai=True)
+    - Supports OpenRouter (recommended, free options available) or OpenAI
+    - Set OPENROUTER_API_KEY or OPENAI_API_KEY environment variable
     - Local transformers models are lazy-loaded only when needed to avoid startup crashes
-    - For production, set OPENAI_API_KEY and use_openai=True to avoid memory issues
     - Local models require significant RAM (1GB+) and will crash on free hosting tiers
     """
     
@@ -53,11 +54,32 @@ class LessonGeneratorService:
             use_openai: If True, use OpenAI API. If False, use local models.
                        If None (default), auto-detect based on OPENAI_API_KEY availability.
         """
-        # Auto-detect: prefer OpenAI if API key is available (safer for production)
+        # Auto-detect: prefer OpenRouter/OpenAI if API key is available (safer for production)
         if use_openai is None:
-            use_openai = OPENAI_AVAILABLE and getattr(settings, 'OPENAI_API_KEY', None) is not None
+            openrouter_key = getattr(settings, 'OPENROUTER_API_KEY', None)
+            openai_key = getattr(settings, 'OPENAI_API_KEY', None)
+            use_openai = OPENAI_AVAILABLE and (openrouter_key is not None or openai_key is not None)
         
         self.use_openai = use_openai and OPENAI_AVAILABLE
+        
+        # Determine which API to use
+        self.openrouter_key = getattr(settings, 'OPENROUTER_API_KEY', None)
+        self.openai_key = getattr(settings, 'OPENAI_API_KEY', None)
+        self.use_openrouter = self.use_openai and self.openrouter_key is not None
+        
+        # Log initialization status
+        print("\n" + "="*60)
+        print("🔧 LessonGeneratorService Initialized")
+        print("="*60)
+        print(f"✨ AI Mode: {'ENABLED' if self.use_openai else 'DISABLED (rule-based)'}")
+        if self.use_openai:
+            print(f"🌐 API Provider: {'OpenRouter' if self.use_openrouter else 'OpenAI'}")
+            if self.use_openrouter:
+                print(f"🔑 OpenRouter Key: {self.openrouter_key[:15]}..." if self.openrouter_key else "❌ No key")
+            else:
+                print(f"🔑 OpenAI Key: {self.openai_key[:15]}..." if self.openai_key else "❌ No key")
+        print("="*60 + "\n")
+        
         self.model_name = None
         self._summarizer = None
         self._qa_generator = None
@@ -84,12 +106,24 @@ class LessonGeneratorService:
         return self._summarizer
     
     def _call_openai(self, prompt: str, system_prompt: str = None, max_tokens: int = 2500) -> str:
-        """Call OpenAI API for content generation with improved prompting"""
+        """Call OpenRouter or OpenAI API for content generation with improved prompting"""
         if not self.use_openai:
             return ""
         
         try:
-            client = openai.OpenAI(api_key=getattr(settings, 'OPENAI_API_KEY', None))
+            if self.use_openrouter:
+                # Use OpenRouter API (compatible with OpenAI client)
+                client = openai.OpenAI(
+                    api_key=self.openrouter_key,
+                    base_url="https://openrouter.ai/api/v1"
+                )
+                # Use an affordable model from OpenRouter
+                # Options: meta-llama/llama-3-8b-instruct, google/gemini-flash-1.5
+                model = "meta-llama/llama-3-8b-instruct"
+            else:
+                # Use OpenAI API
+                client = openai.OpenAI(api_key=self.openai_key)
+                model = "gpt-4o-mini"
             
             default_system = """You are an expert educational content specialist with deep expertise in:
 - Curriculum design and instructional pedagogy
@@ -101,19 +135,25 @@ Your task is to analyze and transform extracted PDF textbook content into well-s
 Always maintain educational accuracy while making content engaging and accessible.
 You must respond ONLY with valid JSON - no markdown, no code blocks, no explanations outside the JSON."""
 
+            print(f"🔄 Calling AI API: {model}")
+            print(f"📊 Max tokens: {max_tokens} | Temperature: 0.5")
+            
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=model,
                 messages=[
                     {"role": "system", "content": system_prompt or default_system},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=max_tokens,
                 temperature=0.5,
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"} if not self.use_openrouter else None
             )
-            return response.choices[0].message.content
+            
+            content = response.choices[0].message.content
+            print(f"✅ AI Response received ({len(content)} chars)")
+            return content
         except Exception as e:
-            print(f"OpenAI API error: {e}")
+            print(f"AI API error: {e}")
             return ""
     
     def generate_lesson_from_chapter(
@@ -151,10 +191,21 @@ You must respond ONLY with valid JSON - no markdown, no code blocks, no explanat
                 key_concepts=lesson_data['key_concepts'],
                 estimated_duration=lesson_data['estimated_duration'],
                 difficulty_level=lesson_data['difficulty_level'],
-                ai_model_used=self.model_name or 'rule-based',
-                generation_params={'source': 'ai_assisted'},
+                ai_model_used=self.model_name or ('openai' if self.use_openai else 'rule-based'),
+                generation_params={'source': 'ai_assisted' if self.use_openai else 'rule-based'},
                 quality_score=lesson_data['quality_score']
             )
+            
+            print("\n" + "="*80)
+            print("💾 LESSON SAVED TO DATABASE")
+            print("="*80)
+            print(f"✅ Lesson ID: {lesson.id}")
+            print(f"📌 Title: {lesson.title}")
+            print(f"🤖 AI Model Used: {lesson.ai_model_used}")
+            print(f"📝 Introduction Length: {len(lesson.introduction)} chars")
+            print(f"🎯 Learning Objectives: {len(lesson.learning_objectives)} items")
+            print(f"🔑 Key Concepts: {len(lesson.key_concepts)} items")
+            print("="*80 + "\n")
             
             # Generate sections
             self._generate_lesson_sections(lesson, lesson_data)
@@ -333,22 +384,62 @@ IMPORTANT GUIDELINES:
 - difficulty_level should be "beginner" for grades 1-3, "intermediate" for grades 4-6, "advanced" for grades 7+
 - estimated_duration should reflect actual lesson complexity (15-60 minutes)"""
 
+        print("\n" + "="*80)
+        print("🤖 CALLING AI FOR LESSON GENERATION")
+        print("="*80)
+        print(f"📚 Chapter: {chapter.title}")
+        print(f"📊 Subject: {chapter.subject.name} | Grade: {chapter.grade.name}")
+        print(f"📝 Content Length: {len(processed_content)} characters")
+        print("="*80 + "\n")
+        
         response = self._call_openai(prompt, max_tokens=3500)
+        
+        print("\n" + "="*80)
+        print("📥 RAW AI RESPONSE (FULL)")
+        print("="*80)
+        print(response)
+        print("="*80)
+        print(f"📏 Total Response Length: {len(response)} characters")
+        print("="*80 + "\n")
         
         try:
             data = json.loads(response)
+            print("\n" + "="*80)
+            print("✅ JSON PARSED SUCCESSFULLY")
+            print("="*80)
+            print(f"📌 Title: {data.get('title', 'N/A')}")
+            print(f"📄 Sections: {len(data.get('sections', []))}")
+            print(f"❓ Questions: {len(data.get('questions', []))}")
+            print(f"🎯 Objectives: {len(data.get('learning_objectives', []))}")
+            
+            if data.get('sections'):
+                print("\n" + "="*60)
+                print("📚 SECTION CONTENT PREVIEW:")
+                print("="*60)
+                for i, s in enumerate(data.get('sections', [])):
+                    print(f"\n🔹 Section {i+1}: {s.get('title', 'Untitled')}")
+                    print(f"   Type: {s.get('type', 'unknown')}")
+                    content = s.get('content', '')
+                    print(f"   Length: {len(content)} characters")
+                    # Show first 300 chars of content
+                    print(f"   Preview: {content[:300]}{'...' if len(content) > 300 else ''}")
+                print("="*60)
+            
+            print("\n" + "="*80 + "\n")
             return self._format_analysis_data(data, chapter)
         except json.JSONDecodeError as e:
-            print(f"JSON parsing error: {e}")
+            print(f"❌ JSON parsing error: {e}")
             # Try to extract JSON from response if wrapped in markdown
             json_match = re.search(r'\{[\s\S]*\}', response)
             if json_match:
                 try:
                     data = json.loads(json_match.group())
+                    print("✅ Extracted JSON from markdown wrapper")
                     return self._format_analysis_data(data, chapter)
                 except:
                     pass
             # Fallback to rule-based if JSON parsing fails
+            print("⚠️ Falling back to rule-based generation")
             return self._analyze_with_rules(chapter, content)
     
     def _preprocess_content_for_ai(self, content: str) -> str:
@@ -977,8 +1068,12 @@ IMPORTANT GUIDELINES:
         """Create LessonSection objects from analyzed data"""
         sections = lesson_data.get('sections', [])
         
-        for section_data in sections:
-            LessonSection.objects.create(
+        print("\n" + "="*80)
+        print("📚 SAVING SECTIONS TO DATABASE")
+        print("="*80)
+        
+        for i, section_data in enumerate(sections):
+            section = LessonSection.objects.create(
                 lesson=lesson,
                 section_type=section_data.get('type', 'explanation'),
                 title=section_data.get('title', 'Section'),
@@ -988,6 +1083,17 @@ IMPORTANT GUIDELINES:
                 interactive_data={},
                 embedded_questions=[]
             )
+            
+            print(f"\n✅ Section {i+1} Saved:")
+            print(f"   ID: {section.id}")
+            print(f"   Title: {section.title}")
+            print(f"   Type: {section.section_type}")
+            print(f"   Content Length: {len(section.content)} chars")
+            print(f"   Content Preview: {section.content[:200]}...")
+            
+        print("\n" + "="*80)
+        print(f"✅ Total Sections Saved: {len(sections)}")
+        print("="*80 + "\n")
     
     def _generate_questions(self, lesson: GeneratedLesson, lesson_data: Dict):
         """Create GeneratedQuestion objects"""
@@ -1007,6 +1113,10 @@ IMPORTANT GUIDELINES:
     
     def _format_analysis_data(self, data: Dict, chapter: TextbookChapter) -> Dict:
         """Format AI response data into standard structure with validation"""
+        
+        print("\n" + "="*80)
+        print("🔄 FORMATTING AI DATA")
+        print("="*80)
         
         # Handle key_concepts which can be list of strings or list of dicts
         raw_concepts = data.get('key_concepts', [])
@@ -1055,7 +1165,7 @@ IMPORTANT GUIDELINES:
         except (ValueError, TypeError):
             duration = 30
         
-        return {
+        formatted_data = {
             'title': data.get('title', chapter.title) or chapter.title,
             'introduction': data.get('introduction', '') or f"Welcome to this lesson on {chapter.title}.",
             'objectives': data.get('learning_objectives', []) or ['Understand the key concepts presented'],
@@ -1067,6 +1177,26 @@ IMPORTANT GUIDELINES:
             'real_world_applications': data.get('real_world_applications', []),
             'quality_score': 0.9  # Higher score for AI-generated content
         }
+        
+        print(f"📊 Formatted Data Summary:")
+        print(f"   Title: {formatted_data['title']}")
+        print(f"   Introduction: {formatted_data['introduction'][:100]}...")
+        print(f"   Sections: {len(sections)}")
+        print(f"   Questions: {len(questions)}")
+        print(f"   Duration: {duration} min")
+        
+        if sections:
+            print("\n   📝 What Will Be Saved to Database:")
+            print("   " + "-"*70)
+            for i, s in enumerate(sections):
+                print(f"   Section {i+1}: {s['title']} ({s['type']})")
+                print(f"      Content Length: {len(s['content'])} chars")
+                print(f"      First 200 chars: {s['content'][:200]}...")
+                print()
+        
+        print("="*80 + "\n")
+        
+        return formatted_data
     
     def publish_lesson_to_capsule(self, lesson: GeneratedLesson) -> Optional['CurriculumCapsule']:
         """

@@ -240,7 +240,12 @@ export class LessonGenerationComponent {
         `;
 
         this.attachEventListeners(container);
-        this.loadInitialData();
+        
+        // Store a reference to the container for later use
+        this.container = container;
+        
+        // Store a reference to load data after container is appended
+        container._loadInitialData = () => this.loadInitialData(container);
 
         return container;
     }
@@ -323,13 +328,6 @@ export class LessonGenerationComponent {
                                 <label for="end-page">End Page (optional)</label>
                                 <input type="number" id="end-page" min="1" placeholder="Last">
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="auto-generate-pdf">
-                                ✨ Automatically generate lesson after upload
-                            </label>
                         </div>
                     </div>
 
@@ -658,8 +656,8 @@ export class LessonGenerationComponent {
     /**
      * Load initial data
      */
-    async loadInitialData() {
-        const chaptersPanel = document.querySelector('#chapters-view');
+    async loadInitialData(container) {
+        const chaptersPanel = container.querySelector('#chapters-view');
         if (chaptersPanel) {
             await this.loadChapters(chaptersPanel);
         }
@@ -773,7 +771,7 @@ export class LessonGenerationComponent {
 
             if (response.status === 'success') {
                 showNotification('Lesson generated successfully!', 'success');
-                this.loadChapters(document.querySelector('#chapters-view'));
+                this.loadChapters(this.container.querySelector('#chapters-view'));
             } else {
                 showNotification('Lesson generation failed', 'error');
             }
@@ -800,18 +798,18 @@ export class LessonGenerationComponent {
             const lesson = lessons[0];
             
             // Switch to lessons tab and show details
-            const lessonsPanel = document.querySelector('#lessons-view');
+            const lessonsPanel = this.container.querySelector('#lessons-view');
             if (lessonsPanel) {
                 // Activate lessons tab
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
-                document.querySelector('[data-view="lessons"]')?.classList.add('active');
+                this.container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                this.container.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+                this.container.querySelector('[data-view="lessons"]')?.classList.add('active');
                 lessonsPanel.classList.add('active');
 
                 // Show lesson details
                 lessonsPanel.innerHTML = `
                     <div class="lesson-detail">
-                        <button class="btn btn-secondary back-btn" onclick="this.closest('.lesson-detail').remove(); document.querySelector('#lessons-view').innerHTML = '<div class=\\'content-loading\\'>Loading lessons...</div>';">
+                        <button class="btn btn-secondary back-btn">
                             ← Back to Lessons
                         </button>
                         <h3>${lesson.title}</h3>
@@ -828,6 +826,14 @@ export class LessonGenerationComponent {
                         </div>
                     </div>
                 `;
+                
+                // Attach back button listener
+                const backBtn = lessonsPanel.querySelector('.back-btn');
+                if (backBtn) {
+                    backBtn.addEventListener('click', () => {
+                        this.loadLessons(lessonsPanel);
+                    });
+                }
             }
         } catch (error) {
             showNotification('Failed to load lesson details', 'error');
@@ -883,8 +889,8 @@ export class LessonGenerationComponent {
         if (startPage) formData.append('start_page', startPage);
         if (endPage) formData.append('end_page', endPage);
 
-        const autoGenerate = form.querySelector('#auto-generate-pdf')?.checked;
-        if (autoGenerate) formData.append('auto_generate', 'true');
+        // Always auto-generate lesson after upload
+        formData.append('auto_generate', 'true');
 
         try {
             showNotification('Uploading PDF and extracting text... This may take a moment.', 'info');
@@ -920,13 +926,19 @@ export class LessonGenerationComponent {
                 }
 
                 // Reload chapters
-                this.loadChapters(document.querySelector('#chapters-view'));
+                this.loadChapters(this.container.querySelector('#chapters-view'));
                 
-                // If lesson was auto-generated, switch to lessons tab
-                if (data.lesson) {
-                    setTimeout(() => {
-                        const lessonsTab = document.querySelector('[data-view="lessons"]');
-                        lessonsTab?.click();
+                // If lesson was auto-generated, navigate to the lesson detail
+                if (data.lesson && data.lesson.id) {
+                    setTimeout(async () => {
+                        // Switch to lessons tab
+                        this.container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                        this.container.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+                        this.container.querySelector('[data-view="lessons"]')?.classList.add('active');
+                        this.container.querySelector('#lessons-view')?.classList.add('active');
+                        
+                        // View the generated lesson
+                        await this.viewLessonDetails(data.lesson.id);
                     }, 1500);
                 }
             } else {
@@ -956,7 +968,8 @@ export class LessonGenerationComponent {
             chapter_number: form.querySelector('#chapter-number').value,
             source_book: form.querySelector('#source-book').value,
             page_numbers: form.querySelector('#page-numbers').value,
-            raw_content: content
+            raw_content: content,
+            auto_generate: true
         };
 
         try {
@@ -964,11 +977,26 @@ export class LessonGenerationComponent {
 
             const response = await apiRequest('/api/chapters/', 'POST', formData);
 
-            showNotification('Chapter uploaded successfully!', 'success');
+            const message = response.message || (response.lesson ? 'Chapter uploaded and lesson generated successfully!' : 'Chapter uploaded successfully!');
+            showNotification(message, 'success');
             form.reset();
             
             // Reload chapters
-            this.loadChapters(document.querySelector('#chapters-view'));
+            this.loadChapters(this.container.querySelector('#chapters-view'));
+            
+            // If lesson was auto-generated, navigate to the lesson detail
+            if (response.lesson && response.lesson.id) {
+                setTimeout(async () => {
+                    // Switch to lessons tab
+                    this.container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    this.container.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+                    this.container.querySelector('[data-view="lessons"]')?.classList.add('active');
+                    this.container.querySelector('#lessons-view')?.classList.add('active');
+                    
+                    // View the generated lesson
+                    await this.viewLessonDetails(response.lesson.id);
+                }, 1500);
+            }
         } catch (error) {
             showNotification('Upload failed: ' + error.message, 'error');
             console.error(error);
@@ -1251,7 +1279,7 @@ export class LessonGenerationComponent {
     async viewLessonDetails(lessonId) {
         try {
             const lesson = await apiRequest(`/api/generated-lessons/${lessonId}/`, 'GET');
-            const panel = document.querySelector('#lessons-view');
+            const panel = this.container.querySelector('#lessons-view');
             
             if (panel) {
                 panel.innerHTML = `
@@ -1292,7 +1320,7 @@ export class LessonGenerationComponent {
                                     <div class="section-item">
                                         <strong>${i + 1}. ${s.title}</strong>
                                         <span class="section-type">(${s.section_type})</span>
-                                        <p>${s.content ? s.content.substring(0, 200) + '...' : ''}</p>
+                                        <div class="section-content">${s.content || 'No content available'}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -1326,8 +1354,10 @@ export class LessonGenerationComponent {
                         .lesson-meta { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
                         .lesson-section { margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; }
                         .lesson-section h4 { margin-bottom: 10px; color: #2563eb; }
-                        .section-item, .question-item { padding: 10px; background: #fafafa; margin-bottom: 10px; border-radius: 4px; }
-                        .section-type { color: #666; font-size: 0.9em; }
+                        .section-item, .question-item { padding: 15px; background: #fafafa; margin-bottom: 15px; border-radius: 4px; }
+                        .section-item strong { display: block; margin-bottom: 8px; font-size: 1.1em; }
+                        .section-type { color: #666; font-size: 0.9em; margin-left: 8px; }
+                        .section-content { margin-top: 10px; line-height: 1.6; white-space: pre-wrap; }
                         .answer { color: #059669; }
                         .lesson-actions-detail { margin-top: 20px; display: flex; gap: 10px; }
                     </style>

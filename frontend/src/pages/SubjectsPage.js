@@ -36,6 +36,9 @@ export class SubjectsPage {
                         <p>${subject.description || 'Explore lessons in this subject'}</p>
                     </div>
                 `).join('');
+                
+                // Add click handlers
+                this.attachEventListeners();
             } else {
                 container.innerHTML = '<p class="info-message">No subjects available yet.</p>';
             }
@@ -43,5 +46,16 @@ export class SubjectsPage {
             console.error('Error loading subjects:', error);
             container.innerHTML = '<p class="error-message">Failed to load subjects. Please try again.</p>';
         }
+    }
+    
+    attachEventListeners() {
+        // Add click handlers to subject cards
+        document.querySelectorAll('.subject-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const subjectId = card.getAttribute('data-subject-id');
+                // Navigate to lessons page with subject filter
+                window.location.href = `lessons.html?subject=${subjectId}`;
+            });
+        });
     }
 }

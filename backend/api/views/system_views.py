@@ -61,24 +61,42 @@ def ai_integration_status(request):
             'install_command': 'pip install torch'
         }
     
-    # Check for OpenAI
+    # Check for OpenAI/OpenRouter
     try:
         import openai
         status['dependencies']['openai'] = {
             'installed': True,
             'version': openai.__version__,
-            'description': 'OpenAI API client'
+            'description': 'OpenAI/OpenRouter API client'
         }
-        api_key_configured = hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY
-        status['generation_modes']['openai'] = api_key_configured
-        status['dependencies']['openai']['api_key_configured'] = api_key_configured
+        
+        # Check for OpenRouter API key (preferred)
+        openrouter_key = getattr(settings, 'OPENROUTER_API_KEY', None)
+        openai_key = getattr(settings, 'OPENAI_API_KEY', None)
+        
+        if openrouter_key:
+            status['generation_modes']['openrouter'] = True
+            status['generation_modes']['api'] = 'openrouter'
+            status['dependencies']['openai']['api_key_configured'] = True
+            status['dependencies']['openai']['provider'] = 'OpenRouter'
+        elif openai_key:
+            status['generation_modes']['openai'] = True
+            status['generation_modes']['api'] = 'openai'
+            status['dependencies']['openai']['api_key_configured'] = True
+            status['dependencies']['openai']['provider'] = 'OpenAI'
+        else:
+            status['generation_modes']['openai'] = False
+            status['generation_modes']['openrouter'] = False
+            status['dependencies']['openai']['api_key_configured'] = False
+            
     except ImportError:
         status['dependencies']['openai'] = {
             'installed': False,
-            'description': 'Optional: For higher quality generation',
+            'description': 'Optional: For API-based AI generation (OpenRouter/OpenAI)',
             'install_command': 'pip install openai'
         }
         status['generation_modes']['openai'] = False
+        status['generation_modes']['openrouter'] = False
     
     # Check if models are available
     status['models_available'] = status['dependencies'].get('transformers', {}).get('installed', False)

@@ -36,7 +36,7 @@ class DashboardViewSet(viewsets.ViewSet):
         
         return Response(stats)
     
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
     def admin_stats(self, request):
         """Get admin dashboard statistics"""
         # Basic counts

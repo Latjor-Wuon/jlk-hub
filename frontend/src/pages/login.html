@@ -1,31 +1,103 @@
-<!-- Login Page -->
-<div class="auth-container">
-    <div class="auth-card">
-        <h2>Login to JLN Hub</h2>
-        <p class="auth-subtitle">Access your learning dashboard</p>
-        
-        <form id="login-form" class="auth-form">
-            <div class="form-group">
-                <label for="login-username">Username</label>
-                <input type="text" id="login-username" name="username" required>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - JLN Hub</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🎓 JLN Hub</h1>
+                <p class="tagline">Offline-First Learning Platform</p>
             </div>
-            
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" name="password" required>
+            <ul class="nav-menu">
+                <li><a href="../home.html" class="nav-link">Home</a></li>
+                <li><a href="../subjects.html" class="nav-link">Subjects</a></li>
+                <li><a href="../quizzes.html" class="nav-link">Quizzes</a></li>
+                <li><a href="../simulations.html" class="nav-link">Simulations</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h2>Login to JLN Hub</h2>
+                    <p class="auth-subtitle">Access your learning dashboard</p>
+                    
+                    <form id="login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" name="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" name="password" required>
+                        </div>
+                        
+                        <div id="login-error" class="error-message" style="display: none;"></div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </form>
+                    
+                    <p class="auth-switch">
+                        Don't have an account? <a href="register.html">Register here</a>
+                    </p>
+                    
+                    <p class="auth-switch">
+                        <a href="../home.html">Continue as guest</a>
+                    </p>
+                </div>
             </div>
-            
-            <div id="login-error" class="error-message" style="display: none;"></div>
-            
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-        </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Jinubia Learning Nexus Hub. Empowering learners in South Sudan.</p>
+            <p class="offline-indicator">
+                <span id="online-status">🟢 Online</span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/components/auth.js"></script>
+    <script type="module">
+        import { initCommon } from '/static/utils/common.js';
         
-        <p class="auth-switch">
-            Don't have an account? <a href="#register">Register here</a>
-        </p>
+        // Initialize common UI
+        initCommon();
         
-        <p class="auth-switch">
-            <a href="#home">Continue as guest</a>
-        </p>
-    </div>
-</div>
+        // Handle login form submission
+        const authManager = window.AuthManager ? new window.AuthManager() : null;
+        
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (!authManager) {
+                errorEl.textContent = 'Authentication system not available.';
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            const result = await authManager.login(username, password);
+            
+            if (result.success) {
+                window.location.href = '../home.html';
+            } else {
+                errorEl.textContent = result.error || 'Login failed. Please try again.';
+                errorEl.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -66,8 +66,28 @@ class TextbookChapterViewSet(viewsets.ModelViewSet):
         return queryset.order_by('-created_at')
     
     def perform_create(self, serializer):
-        """Save chapter with current user as uploader"""
-        serializer.save(uploaded_by=self.request.user)
+        """Save chapter with current user as uploader and optionally auto-generate lesson"""
+        chapter = serializer.save(uploaded_by=self.request.user)
+        
+        # Auto-generate lesson if requested
+        auto_generate = self.request.data.get('auto_generate', 'false')
+        if auto_generate in [True, 'true', '1', 'yes']:
+            generator = LessonGeneratorService()  # Auto-detect AI
+            lesson = generator.generate_lesson_from_chapter(chapter)
+            # Store lesson data in the request context for response
+            self.request._generated_lesson = lesson
+    
+    def create(self, request, *args, **kwargs):
+        """Override create to include generated lesson in response"""
+        response = super().create(request, *args, **kwargs)
+        
+        # Add generated lesson to response if available
+        if hasattr(request, '_generated_lesson') and request._generated_lesson:
+            from api.serializers import GeneratedLessonSerializer
+            response.data['lesson'] = GeneratedLessonSerializer(request._generated_lesson).data
+            response.data['message'] = 'Chapter uploaded and lesson generated successfully.'
+        
+        return response
 
     @action(detail=False, methods=['post'])
     def upload_pdf(self, request):
@@ -157,7 +177,7 @@ class TextbookChapterViewSet(viewsets.ModelViewSet):
             # Auto-generate lesson if requested
             auto_generate = request.data.get('auto_generate', 'false')
             if auto_generate in [True, 'true', '1', 'yes']:
-                generator = LessonGeneratorService(use_openai=False)
+                generator = LessonGeneratorService()  # Auto-detect AI
                 lesson = generator.generate_lesson_from_chapter(chapter)
                 if lesson:
                     response_data['lesson'] = GeneratedLessonSerializer(lesson).data
@@ -192,7 +212,7 @@ class TextbookChapterViewSet(viewsets.ModelViewSet):
         # Validate request
         serializer = LessonGenerationRequestSerializer(data={
             'chapter_id': chapter.id,
-            'use_openai': request.data.get('use_openai', False),
+            'use_openai': request.data.get('use_openai', True),  # Default to True
             'validate_only': request.data.get('validate_only', False)
         })
         serializer.is_valid(raise_exception=True)

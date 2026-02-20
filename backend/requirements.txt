@@ -4,6 +4,7 @@ django-cors-headers>=4.6.0
 Pillow>=11.0.0
 gunicorn==25.1.0
 whitenoise==6.11.0
+python-dotenv>=1.0.0
 
 # AI/ML Dependencies for Lesson Generation
 transformers>=4.36.0
@@ -11,7 +12,8 @@ torch>=2.1.0
 sentencepiece>=0.1.99
 accelerate>=0.25.0
 
-# Optional: OpenAI API support (for content preparation phase)
+# Optional: OpenAI/OpenRouter API support (for AI-powered lesson generation)
+# Works with both OpenAI API and OpenRouter (free options available)
 openai>=1.6.0
 tiktoken>=0.5.2
 
