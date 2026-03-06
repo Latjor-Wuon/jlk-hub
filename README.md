@@ -2,6 +2,8 @@
 
 An offline-first educational application designed to deliver South Sudan's national curriculum to primary and secondary school learners, regardless of internet availability or infrastructure constraints.
 
+## Deployed link: https://jln-hub-production-a5de.up.railway.app/
+
 ## Architecture
 
 JLN Hub is built as a **Django monorepo** where both backend API and frontend are integrated into a single Django application. This architecture provides:
