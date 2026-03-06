@@ -1,7 +1,21 @@
 // Shared Auth UI Utilities for JLN Hub
 
+// Pages that do not require authentication
+const PUBLIC_PATHS = ['/', '/landing.html', '/pages/login.html', '/pages/register.html'];
+
+function isPublicPage() {
+    return PUBLIC_PATHS.some(p => window.location.pathname === p || window.location.pathname.endsWith(p));
+}
+
 export function initAuthUI() {
     const authManager = window.AuthManager ? new window.AuthManager() : null;
+
+    // Auth guard: redirect unauthenticated users on protected pages to landing
+    if (!isPublicPage() && (!authManager || !authManager.isAuthenticated())) {
+        window.location.href = '/landing.html';
+        return;
+    }
+
     const navAuthContainer = document.getElementById('nav-auth');
     const adminNavLink = document.getElementById('admin-nav-link');
     const lessonGenNavLink = document.getElementById('lesson-gen-nav-link');
@@ -19,10 +33,9 @@ export function initAuthUI() {
             </div>
         `;
         
-        // Add logout handler
+        // Add logout handler — auth.js logout() already redirects to /landing.html
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await authManager.logout();
-            window.location.href = '/home.html';
         });
         
         // Show admin menu if user is staff

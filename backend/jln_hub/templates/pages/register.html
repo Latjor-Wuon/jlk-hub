@@ -4,138 +4,331 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - JLN Hub</title>
-    <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --orange: #E8631A;
+            --orange-light: #FF8C42;
+            --orange-pale: #FFF3EA;
+            --dark: #1a1a2e;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky; top:0; z-index:100;
+            flex-shrink:0;
+        }
+        .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+        .nav-logo-icon {
+            width:38px; height:38px;
+            background:linear-gradient(135deg,var(--orange),var(--orange-light));
+            border-radius:9px; display:flex; align-items:center; justify-content:center;
+            color:white; font-size:1.1rem;
+        }
+        .nav-logo-text { font-size:1.2rem; font-weight:700; color:var(--dark); }
+        .nav-logo-text span { color:var(--orange); }
+        .nav-back {
+            display:flex; align-items:center; gap:6px;
+            color:var(--gray); text-decoration:none; font-size:0.9rem; font-weight:500;
+            padding:6px 14px; border-radius:50px; border:1.5px solid var(--border);
+            transition:all .2s;
+        }
+        .nav-back:hover { color:var(--orange); border-color:var(--orange); }
+        /* Split layout */
+        .auth-layout {
+            flex:1;
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            min-height: calc(100vh - 68px);
+        }
+        /* Left */
+        .auth-panel-left {
+            background: linear-gradient(145deg, var(--orange) 0%, var(--orange-light) 100%);
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            padding:3rem; position:relative; overflow:hidden;
+        }
+        .auth-panel-left::before {
+            content:''; position:absolute;
+            width:300px; height:300px;
+            background:rgba(255,255,255,0.08);
+            border-radius:50%; top:-100px; right:-80px;
+        }
+        .auth-panel-left::after {
+            content:''; position:absolute;
+            width:200px; height:200px;
+            background:rgba(255,255,255,0.06);
+            border-radius:50%; bottom:-60px; left:-60px;
+        }
+        .auth-brand { text-align:center; color:white; position:relative; z-index:1; }
+        .auth-brand-icon {
+            width:80px; height:80px; background:rgba(255,255,255,0.2);
+            border-radius:20px; display:flex; align-items:center; justify-content:center;
+            font-size:2.5rem; margin:0 auto 1.5rem; backdrop-filter:blur(8px);
+        }
+        .auth-brand h1 { font-size:2rem; font-weight:800; margin-bottom:0.5rem; }
+        .auth-brand p { font-size:1rem; opacity:0.88; line-height:1.6; max-width:300px; }
+        .auth-perks { margin-top:2rem; display:flex; flex-direction:column; gap:0.9rem; }
+        .perk { display:flex; align-items:center; gap:12px; }
+        .perk-icon {
+            width:36px; height:36px; background:rgba(255,255,255,0.2);
+            border-radius:8px; display:flex; align-items:center; justify-content:center;
+            font-size:1rem; flex-shrink:0;
+        }
+        .perk-text { font-size:0.9rem; opacity:0.9; text-align:left; }
+        /* Right */
+        .auth-panel-right {
+            display:flex; align-items:center; justify-content:center;
+            padding:2.5rem 2rem; background:white; overflow-y:auto;
+        }
+        .auth-card { width:100%; max-width:460px; }
+        .auth-card-header { margin-bottom:1.75rem; }
+        .auth-card-header h2 { font-size:1.7rem; font-weight:800; color:var(--dark); margin-bottom:0.3rem; }
+        .auth-card-header p { color:var(--gray); font-size:0.93rem; }
+        .form-group { margin-bottom:1.1rem; }
+        .form-group label { display:block; font-size:0.85rem; font-weight:600; color:var(--dark); margin-bottom:0.35rem; }
+        .form-group input,
+        .form-group select {
+            width:100%; padding:0.7rem 1rem;
+            border:1.5px solid var(--border); border-radius:10px;
+            font-size:0.93rem; color:var(--dark);
+            transition:all .2s; outline:none; background:white;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color:var(--orange);
+            box-shadow:0 0 0 3px rgba(232,99,26,0.1);
+        }
+        .form-input-icon { position:relative; }
+        .form-input-icon i {
+            position:absolute; left:14px; top:50%; transform:translateY(-50%);
+            color:var(--gray); font-size:0.88rem; pointer-events:none;
+        }
+        .form-input-icon input { padding-left:2.4rem; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+        .form-pwd-toggle {
+            position:absolute; right:14px; top:50%; transform:translateY(-50%);
+            background:none; border:none; cursor:pointer; color:var(--gray); font-size:0.88rem;
+        }
+        .btn-auth {
+            width:100%; padding:0.85rem;
+            background:var(--orange); color:white;
+            border:none; border-radius:50px;
+            font-size:1rem; font-weight:700;
+            cursor:pointer; transition:all .25s; margin-top:0.5rem;
+        }
+        .btn-auth:hover {
+            background:var(--dark);
+            transform:translateY(-1px);
+            box-shadow:0 6px 20px rgba(232,99,26,.25);
+        }
+        .error-message {
+            background:#fef2f2; color:#dc2626;
+            padding:0.7rem 1rem; border-radius:8px;
+            font-size:0.87rem; margin-bottom:1rem;
+            border:1px solid #fecaca; display:none;
+        }
+        .auth-footer { text-align:center; margin-top:1.25rem; font-size:0.9rem; color:var(--gray); }
+        .auth-footer a { color:var(--orange); font-weight:600; text-decoration:none; }
+        .auth-footer a:hover { text-decoration:underline; }
+        .req-note { font-size:0.78rem; color:var(--gray); margin-top:0.75rem; }
+        @media (max-width:768px) {
+            .auth-layout { grid-template-columns:1fr; }
+            .auth-panel-left { display:none; }
+            .auth-panel-right { padding:2rem 1rem; align-items:flex-start; padding-top:2rem; }
+            .form-row { grid-template-columns:1fr; }
+        }
+    </style>
 </head>
 <body>
+
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h1>🎓 JLN Hub</h1>
-                <p class="tagline">Offline-First Learning Platform</p>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="/home.html" class="nav-link">Home</a></li>
-                <li><a href="/subjects.html" class="nav-link">Subjects</a></li>
-                <li><a href="/quizzes.html" class="nav-link">Quizzes</a></li>
-                <li><a href="/simulations.html" class="nav-link">Simulations</a></li>
-            </ul>
-        </div>
+        <a href="/landing.html" class="nav-logo">
+            <div class="nav-logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <span class="nav-logo-text">JLN <span>Hub</span></span>
+        </a>
+        <a href="/landing.html" class="nav-back">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
     </nav>
 
-    <main class="main-content">
-        <div class="container">
-            <div class="auth-container">
-                <div class="auth-card">
-                    <h2>Register for JLN Hub</h2>
-                    <p class="auth-subtitle">Create your learning account</p>
-                    
-                    <form id="register-form" class="auth-form">
-                        <div class="form-group">
-                            <label for="reg-username">Username *</label>
-                            <input type="text" id="reg-username" name="username" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="reg-email">Email (optional)</label>
-                            <input type="email" id="reg-email" name="email">
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="reg-firstname">First Name</label>
-                                <input type="text" id="reg-firstname" name="first_name">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="reg-lastname">Last Name</label>
-                                <input type="text" id="reg-lastname" name="last_name">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="reg-grade">Grade Level</label>
-                                <select id="reg-grade" name="grade">
-                                    <option value="">Select Grade</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="reg-school">School Name</label>
-                                <input type="text" id="reg-school" name="school_name">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="reg-password">Password *</label>
-                            <input type="password" id="reg-password" name="password" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="reg-password2">Confirm Password *</label>
-                            <input type="password" id="reg-password2" name="password2" required>
-                        </div>
-                        
-                        <div id="register-error" class="error-message" style="display: none;"></div>
-                        
-                        <button type="submit" class="btn btn-primary btn-block">Register</button>
-                    </form>
-                    
-                    <p class="auth-switch">
-                        Already have an account? <a href="/pages/login.html">Login here</a>
-                    </p>
+    <div class="auth-layout">
+        <!-- Left Brand Panel -->
+        <div class="auth-panel-left">
+            <div class="auth-brand">
+                <div class="auth-brand-icon"><i class="fas fa-user-graduate"></i></div>
+                <h1>Join JLN Hub!</h1>
+                <p>Start your learning journey today — free access to South Sudan's national curriculum.</p>
+                <div class="auth-perks">
+                    <div class="perk">
+                        <div class="perk-icon"><i class="fas fa-check"></i></div>
+                        <span class="perk-text">Free access to all subjects & lessons</span>
+                    </div>
+                    <div class="perk">
+                        <div class="perk-icon"><i class="fas fa-wifi"></i></div>
+                        <span class="perk-text">Works offline — learn anywhere</span>
+                    </div>
+                    <div class="perk">
+                        <div class="perk-icon"><i class="fas fa-robot"></i></div>
+                        <span class="perk-text">AI-powered lessons & quizzes</span>
+                    </div>
+                    <div class="perk">
+                        <div class="perk-icon"><i class="fas fa-chart-line"></i></div>
+                        <span class="perk-text">Track your learning progress</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 Jinubia Learning Nexus Hub. Empowering learners in South Sudan.</p>
-            <p class="offline-indicator">
-                <span id="online-status">🟢 Online</span>
-            </p>
+        <!-- Right Form Panel -->
+        <div class="auth-panel-right">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <h2>Create Account</h2>
+                    <p>Join thousands of learners across South Sudan</p>
+                </div>
+
+                <div id="register-error" class="error-message"></div>
+
+                <form id="register-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-firstname">First Name</label>
+                            <input type="text" id="reg-firstname" name="first_name" placeholder="First name">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-lastname">Last Name</label>
+                            <input type="text" id="reg-lastname" name="last_name" placeholder="Last name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-username">Username *</label>
+                        <div class="form-input-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="reg-username" name="username" placeholder="Choose a username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-email">Email <span style="font-weight:400;color:var(--gray)">(optional)</span></label>
+                        <div class="form-input-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="reg-email" name="email" placeholder="your@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg-grade">Grade Level</label>
+                            <select id="reg-grade" name="grade">
+                                <option value="">Select Grade</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-school">School Name</label>
+                            <input type="text" id="reg-school" name="school_name" placeholder="Your school">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-password">Password *</label>
+                        <div class="form-input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="reg-password" name="password" placeholder="Create a password" required>
+                            <button type="button" class="form-pwd-toggle" id="pwd-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-password2">Confirm Password *</label>
+                        <div class="form-input-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="reg-password2" name="password2" placeholder="Repeat your password" required>
+                        </div>
+                    </div>
+
+                    <p class="req-note">* Required fields</p>
+
+                    <button type="submit" class="btn-auth">
+                        Create Account <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="/pages/login.html">Sign in</a>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
 
     <script src="/static/components/auth.js"></script>
     <script type="module">
         import { initCommon } from '/static/utils/common.js';
         import { apiClient } from '/static/utils/api.js';
-        
-        // Initialize common UI
         initCommon();
-        
-        // Load grade options
-        async function loadGrades() {
-            const grades = await apiClient.get('/grades/');
-            const gradeSelect = document.getElementById('reg-grade');
-            if (grades && grades.results) {
-                grades.results.forEach(grade => {
-                    const option = document.createElement('option');
-                    option.value = grade.id;
-                    option.textContent = grade.name;
-                    gradeSelect.appendChild(option);
-                });
+
+        // Password toggle
+        document.getElementById('pwd-toggle').addEventListener('click', function() {
+            const input = document.getElementById('reg-password');
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye','fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash','fa-eye');
             }
+        });
+
+        // Load grades
+        async function loadGrades() {
+            try {
+                const grades = await apiClient.get('/grades/');
+                const gradeSelect = document.getElementById('reg-grade');
+                if (grades && grades.results) {
+                    grades.results.forEach(grade => {
+                        const option = document.createElement('option');
+                        option.value = grade.id;
+                        option.textContent = grade.name;
+                        gradeSelect.appendChild(option);
+                    });
+                }
+            } catch(e) {}
         }
-        
         loadGrades();
-        
-        // Handle register form submission
+
         const authManager = window.AuthManager ? new window.AuthManager() : null;
-        
+
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const errorEl = document.getElementById('register-error');
-            
+            errorEl.style.display = 'none';
+
             if (!authManager) {
                 errorEl.textContent = 'Authentication system not available.';
                 errorEl.style.display = 'block';
                 return;
             }
-            
+
             const formData = {
                 username: document.getElementById('reg-username').value,
                 email: document.getElementById('reg-email').value,
@@ -146,15 +339,14 @@
                 grade: document.getElementById('reg-grade').value,
                 school_name: document.getElementById('reg-school').value
             };
-            
+
             if (formData.password !== formData.password2) {
                 errorEl.textContent = 'Passwords do not match.';
                 errorEl.style.display = 'block';
                 return;
             }
-            
+
             const result = await authManager.register(formData);
-            
             if (result.success) {
                 window.location.href = '/home.html';
             } else {

@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLN Hub - Empowering Learners in South Sudan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --orange:       #E8631A;
+            --orange-light: #FF8C42;
+            --orange-pale:  #FFF3EA;
+            --orange-pale2: #FDE8D8;
+            --dark:         #1a1a2e;
+            --dark-2:       #2d2d44;
+            --gray:         #6b7280;
+            --gray-light:   #f9fafb;
+            --white:        #ffffff;
+            --border:       #e5e7eb;
+            --shadow:       0 4px 24px rgba(232,99,26,0.10);
+            --shadow-card:  0 2px 16px rgba(0,0,0,0.08);
+            --radius:       12px;
+            --radius-sm:    8px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--dark);
+            background: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== FLOATING DOTS ===== */
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.18;
+            background: var(--orange);
+            pointer-events: none;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+            gap: 2rem;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--orange), var(--orange-light));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .nav-logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .nav-logo-text span {
+            color: var(--orange);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--orange);
+            background: var(--orange-pale);
+        }
+
+        .nav-auth {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn-outline {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid var(--orange);
+            color: var(--orange);
+            background: transparent;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .btn-outline:hover {
+            background: var(--orange);
+            color: white;
+        }
+
+        .btn-primary {
+            padding: 0.55rem 1.4rem;
+            background: var(--orange);
+            color: white;
+            border: 2px solid var(--orange);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark);
+            border-color: var(--dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(232,99,26,0.25);
+        }
+
+        .btn-lg {
+            padding: 0.85rem 2.2rem;
+            font-size: 1rem;
+            border-radius: 50px;
+        }
+
+        .btn-secondary-outline {
+            padding: 0.85rem 2.2rem;
+            border: 2px solid var(--border);
+            color: var(--dark);
+            background: white;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary-outline:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        /* hamburger */
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            padding: 90px 0 80px;
+            overflow: hidden;
+        }
+
+        .hero-bg-dots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--orange-pale);
+            color: var(--orange);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--orange-pale2);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.25rem;
+            color: var(--dark);
+        }
+
+        .hero h1 span {
+            color: var(--orange);
+        }
+
+        .hero-desc {
+            color: var(--gray);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            max-width: 440px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.75rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-stat-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .hero-stat-num span {
+            color: var(--orange);
+        }
+
+        .hero-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        /* Illustration area */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-illustration {
+            width: 100%;
+            max-width: 480px;
+            background: var(--orange-pale);
+            border-radius: 30px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-illustration-inner {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Floating scene cards */
+        .float-card {
+            position: absolute;
+            background: white;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .float-card.card-1 {
+            top: 10%;
+            right: -20px;
+            animation-delay: 0s;
+        }
+
+        .float-card.card-2 {
+            bottom: 15%;
+            left: -20px;
+            animation-delay: 1s;
+        }
+
+        .float-card.card-3 {
+            bottom: -10px;
+            right: 30px;
+            animation-delay: 1.5s;
+        }
+
+        .float-card .fc-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Decorative circles */
+        .deco-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.12;
+        }
+
+        /* ===== SECTION COMMON ===== */
+        section {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-kicker {
+            display: inline-block;
+            color: var(--orange);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            line-height: 1.25;
+        }
+
+        .section-title span {
+            color: var(--orange);
+        }
+
+        .section-sub {
+            color: var(--gray);
+            font-size: 1.05rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ===== SERVICES ===== */
+        .services {
+            background: white;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .service-card {
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.75rem 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--orange), var(--orange-light));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            border-color: var(--orange-pale2);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .service-card p {
+            font-size: 0.88rem;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .service-link {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--orange);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap 0.2s;
+        }
+
+        .service-link:hover {
+            gap: 8px;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-it-works {
+            background: var(--orange-pale);
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .how-visual {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .how-illustration {
+            text-align: center;
+        }
+
+        .how-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            min-width: 44px;
+            height: 44px;
+            background: var(--orange);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .step-content p {
+            font-size: 0.88rem;
+            color: var(--gray);
+        }
+
+        .how-cta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* ===== FEATURES ===== */
+        .features {
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--orange-pale);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-item h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-item p {
+            font-size: 0.88rem;
+            color: var(--gray);
+        }
+
+        .features-visual {
+            position: relative;
+        }
+
+        .features-img-wrap {
+            background: linear-gradient(135deg, var(--orange-pale), var(--orange-pale2));
+            border-radius: 24px;
+            padding: 2.5rem;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-bubble {
+            position: absolute;
+            background: white;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-bubble.sb-1 {
+            top: 20px;
+            right: -15px;
+        }
+
+        .stats-bubble.sb-2 {
+            bottom: 30px;
+            left: -15px;
+        }
+
+        .sb-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--orange-pale);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .sb-text strong {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .sb-text span {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials {
+            background: var(--gray-light);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .tc-stars {
+            color: var(--orange);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .tc-text {
+            font-size: 0.93rem;
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+        }
+
+        .tc-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tc-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .tc-info strong {
+            display: block;
+            font-size: 0.93rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .tc-info span {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* ===== CTA BANNER ===== */
+        .cta-banner {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            padding: 70px 0;
+        }
+
+        .cta-banner-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .cta-banner h2 {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-banner p {
+            color: rgba(255,255,255,0.88);
+            font-size: 1.05rem;
+        }
+
+        .btn-white {
+            padding: 0.85rem 2.2rem;
+            background: white;
+            color: var(--orange);
+            border: 2px solid white;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-white:hover {
+            background: var(--dark);
+            color: white;
+            border-color: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.75);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin: 0.75rem 0 1.25rem;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .social-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .social-btn:hover {
+            background: var(--orange);
+            color: white;
+        }
+
+        .footer-col h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.1rem;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .footer-col ul a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.55);
+            font-size: 0.88rem;
+            transition: color 0.2s;
+        }
+
+        .footer-col ul a:hover {
+            color: var(--orange);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--orange), var(--orange-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .footer-logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* ===== ANIMATED SVG ILLUSTRATION ===== */
+        .edu-illustration {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        /* ===== MOBILE NAV ===== */
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .nav-toggle { display: block; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 72px; left: 0; right: 0;
+                background: white;
+                border-top: 1px solid var(--border);
+                padding: 1rem;
+                gap: 0.25rem;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+                z-index: 999;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            section { padding: 55px 0; }
+            .hero { padding: 55px 0 45px; }
+            .hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .hero-visual { order: -1; }
+            .hero-illustration { max-width: 100%; }
+            .how-grid, .features-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .testimonials-grid { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+            .cta-banner-inner { flex-direction: column; text-align: center; }
+            .float-card.card-1 { right: 0; }
+            .float-card.card-2 { left: 0; }
+            .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-cta { flex-direction: column; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .hero-stats { gap: 1rem; }
+            .nav-auth .btn-outline { display: none; }
+        }
+
+        /* ===== SCROLL REVEAL ANIMATION ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-inner">
+                <a href="landing.html" class="nav-logo">
+                    <div class="nav-logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span class="nav-logo-text">JLN <span>Hub</span></span>
+                </a>
+
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#services">Subjects</a></li>
+                    <li><a href="#how-it-works">How it Works</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#testimonials">Reviews</a></li>
+                </ul>
+
+                <div class="nav-auth">
+                    <a href="pages/login.html" class="btn-outline">Log In</a>
+                    <a href="pages/register.html" class="btn-primary">Sign Up <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="home">
+        <!-- Background decorative dots -->
+        <div class="hero-bg-dots">
+            <div class="dot" style="width:200px;height:200px;top:-80px;right:-60px;background:var(--orange);"></div>
+            <div class="dot" style="width:120px;height:120px;bottom:30px;left:-40px;background:var(--orange-light);"></div>
+            <div class="dot" style="width:60px;height:60px;top:40%;right:25%;background:var(--orange);"></div>
+        </div>
+
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-star"></i> South Sudan's #1 Learning Platform
+                    </div>
+                    <h1>We create <span>solutions</span> for better learning</h1>
+                    <p class="hero-desc">
+                        Access the full national curriculum — subjects, lessons, quizzes, and simulations — anytime, anywhere, even offline.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="pages/register.html" class="btn-primary btn-lg">
+                            Get Started <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a href="#how-it-works" class="btn-secondary-outline">
+                            <i class="fas fa-play-circle" style="color:var(--orange)"></i> Explore More
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">12<span>+</span></div>
+                            <div class="hero-stat-label">Subjects</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">500<span>+</span></div>
+                            <div class="hero-stat-label">Lessons</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">2k<span>+</span></div>
+                            <div class="hero-stat-label">Students</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="hero-illustration">
+                        <!-- SVG Education Illustration -->
+                        <svg class="edu-illustration" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Student sitting & studying -->
+                            <ellipse cx="200" cy="260" rx="120" ry="20" fill="#FDE8D8" opacity="0.6"/>
+                            <!-- Bean bag chair -->
+                            <ellipse cx="170" cy="230" rx="70" ry="50" fill="#E8631A" opacity="0.85"/>
+                            <ellipse cx="170" cy="220" rx="55" ry="40" fill="#FF8C42" opacity="0.9"/>
+                            <!-- Legs -->
+                            <path d="M140 250 Q130 270 120 275" stroke="#c25510" stroke-width="8" stroke-linecap="round"/>
+                            <path d="M200 250 Q210 265 225 268" stroke="#c25510" stroke-width="8" stroke-linecap="round"/>
+                            <!-- Body -->
+                            <ellipse cx="170" cy="195" rx="28" ry="35" fill="#1a1a2e"/>
+                            <!-- Head -->
+                            <circle cx="170" cy="155" r="28" fill="#F4A261"/>
+                            <!-- Hair -->
+                            <path d="M144 148 Q155 130 170 128 Q185 130 196 148 Q190 135 170 132 Q150 135 144 148Z" fill="#2d2d44"/>
+                            <!-- Eyes -->
+                            <circle cx="162" cy="152" r="3" fill="#2d2d44"/>
+                            <circle cx="178" cy="152" r="3" fill="#2d2d44"/>
+                            <!-- Smile -->
+                            <path d="M163 162 Q170 168 177 162" stroke="#c25510" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <!-- Laptop -->
+                            <rect x="150" y="195" width="70" height="45" rx="5" fill="#2d2d44"/>
+                            <rect x="155" y="200" width="60" height="35" rx="3" fill="#3d3d5c"/>
+                            <!-- Screen content lines -->
+                            <rect x="160" y="206" width="35" height="3" rx="2" fill="var(--orange)" opacity="0.8"/>
+                            <rect x="160" y="213" width="25" height="3" rx="2" fill="rgba(255,255,255,0.4)"/>
+                            <rect x="160" y="220" width="30" height="3" rx="2" fill="rgba(255,255,255,0.4)"/>
+                            <rect x="160" y="227" width="20" height="3" rx="2" fill="rgba(255,255,255,0.4)"/>
+
+                            <!-- Second figure on right -->
+                            <ellipse cx="300" cy="235" rx="55" ry="40" fill="#FF8C42" opacity="0.85"/>
+                            <ellipse cx="300" cy="225" rx="45" ry="32" fill="#E8631A" opacity="0.9"/>
+                            <!-- Body 2 -->
+                            <ellipse cx="300" cy="190" rx="22" ry="30" fill="#4a90d9"/>
+                            <!-- Head 2 -->
+                            <circle cx="300" cy="158" r="24" fill="#F4A261"/>
+                            <!-- Hijab -->
+                            <path d="M278 158 Q280 132 300 130 Q320 132 322 158 Q315 145 300 143 Q285 145 278 158Z" fill="#E8631A"/>
+                            <ellipse cx="300" cy="160" rx="24" ry="10" fill="#E8631A" opacity="0.6"/>
+                            <!-- Eyes 2 -->
+                            <circle cx="294" cy="156" r="2.5" fill="#2d2d44"/>
+                            <circle cx="306" cy="156" r="2.5" fill="#2d2d44"/>
+                            <!-- Smile 2 -->
+                            <path d="M294 165 Q300 170 306 165" stroke="#c25510" stroke-width="2" fill="none" stroke-linecap="round"/>
+                            <!-- Phone/tablet -->
+                            <rect x="286" y="185" width="35" height="50" rx="5" fill="#2d2d44"/>
+                            <rect x="290" y="190" width="27" height="40" rx="3" fill="#3d3d5c"/>
+                            <rect x="293" y="195" width="20" height="3" rx="2" fill="var(--orange)" opacity="0.8"/>
+                            <rect x="293" y="202" width="15" height="3" rx="2" fill="rgba(255,255,255,0.4)"/>
+                            <rect x="293" y="209" width="17" height="3" rx="2" fill="rgba(255,255,255,0.4)"/>
+
+                            <!-- Floating elements -->
+                            <circle cx="80" cy="100" r="12" fill="var(--orange)" opacity="0.3"/>
+                            <circle cx="340" cy="80" r="8" fill="var(--orange)" opacity="0.25"/>
+                            <circle cx="50" cy="200" r="6" fill="var(--orange-light)" opacity="0.35"/>
+                            <circle cx="360" cy="190" r="10" fill="var(--orange-light)" opacity="0.25"/>
+
+                            <!-- Stars -->
+                            <text x="85" y="60" fill="var(--orange)" font-size="18" opacity="0.6">★</text>
+                            <text x="330" y="50" fill="var(--orange)" font-size="14" opacity="0.4">★</text>
+                            <text x="55" y="130" fill="var(--orange-light)" font-size="10" opacity="0.5">●</text>
+                        </svg>
+                    </div>
+
+                    <!-- Floating cards -->
+                    <div class="float-card card-1">
+                        <div class="fc-icon" style="background:#FFF3EA;color:var(--orange)">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;color:var(--gray)">Today's Lesson</div>
+                            <div>Mathematics</div>
+                        </div>
+                    </div>
+                    <div class="float-card card-2">
+                        <div class="fc-icon" style="background:#e8f5e9;color:#27ae60">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;color:var(--gray)">Quiz Score</div>
+                            <div>95% Passed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-kicker">We Provide The Best</span>
+                <h2 class="section-title">Our Learning <span>Features</span></h2>
+                <p class="section-sub">Everything you need to succeed in your academic journey, built into one platform.</p>
+            </div>
+
+            <div class="services-grid">
+                <!-- Subjects -->
+                <div class="service-card reveal reveal-delay-1">
+                    <div class="service-icon" style="background:#FFF3EA;color:var(--orange)">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Subjects & Curriculum</h3>
+                    <p>Browse all national curriculum subjects from Grade 1 to 12, aligned with South Sudan's educational standards.</p>
+                    <a href="pages/login.html" class="service-link">Explore <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- Lessons -->
+                <div class="service-card reveal reveal-delay-2">
+                    <div class="service-icon" style="background:#e8f5e9;color:#27ae60">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>AI-Powered Lessons</h3>
+                    <p>Access structured lessons with AI-generated content, summaries, and learning objectives tailored to your level.</p>
+                    <a href="pages/login.html" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- Quizzes -->
+                <div class="service-card reveal reveal-delay-3">
+                    <div class="service-icon" style="background:#e8eaf6;color:#5c6bc0">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Interactive Quizzes</h3>
+                    <p>Test your knowledge with subject-specific quizzes. Get instant feedback and track your improvement over time.</p>
+                    <a href="pages/login.html" class="service-link">Take a Quiz <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- Simulations -->
+                <div class="service-card reveal reveal-delay-4">
+                    <div class="service-icon" style="background:#fce4ec;color:#e91e63">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3>Simulations</h3>
+                    <p>Dive into interactive science simulations and virtual labs — learn by doing, not just reading.</p>
+                    <a href="pages/login.html" class="service-link">Simulate <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="how-grid">
+                <!-- Visual side -->
+                <div class="how-visual reveal">
+                    <div class="how-illustration">
+                        <svg viewBox="0 0 300 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px">
+                            <!-- Person on couch studying -->
+                            <rect x="30" y="180" width="240" height="80" rx="20" fill="#E8631A" opacity="0.8"/>
+                            <rect x="50" y="165" width="200" height="60" rx="15" fill="#FF8C42" opacity="0.85"/>
+                            <!-- Side arm of couch -->
+                            <rect x="20" y="170" width="30" height="60" rx="10" fill="#E8631A"/>
+                            <rect x="250" y="170" width="30" height="60" rx="10" fill="#E8631A"/>
+
+                            <!-- Body sitting -->
+                            <ellipse cx="150" cy="170" rx="25" ry="30" fill="#1a1a2e"/>
+                            <!-- Arms -->
+                            <path d="M128 165 Q110 175 105 185" stroke="#1a1a2e" stroke-width="10" stroke-linecap="round"/>
+                            <path d="M172 165 Q190 175 195 185" stroke="#1a1a2e" stroke-width="10" stroke-linecap="round"/>
+                            <!-- Head -->
+                            <circle cx="150" cy="138" r="26" fill="#F4A261"/>
+                            <!-- Hair -->
+                            <path d="M126 132 Q135 112 150 110 Q165 112 174 132 Q168 118 150 116 Q132 118 126 132Z" fill="#2d2d44"/>
+                            <!-- Eyes -->
+                            <circle cx="142" cy="135" r="3" fill="#2d2d44"/>
+                            <circle cx="158" cy="135" r="3" fill="#2d2d44"/>
+                            <!-- Eyebrows (focused) -->
+                            <path d="M139 128 Q142 126 145 128" stroke="#2d2d44" stroke-width="1.5" fill="none"/>
+                            <path d="M155 128 Q158 126 161 128" stroke="#2d2d44" stroke-width="1.5" fill="none"/>
+                            <!-- Laptop on lap -->
+                            <rect x="108" y="183" width="84" height="52" rx="6" fill="#2d2d44"/>
+                            <rect x="113" y="188" width="74" height="42" rx="4" fill="#3d3d5c"/>
+                            <!-- Chat bubble on screen -->
+                            <rect x="118" y="193" width="45" height="5" rx="2" fill="var(--orange)"/>
+                            <rect x="118" y="202" width="32" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>
+                            <rect x="118" y="210" width="38" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>
+                            <rect x="118" y="218" width="25" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>
+
+                            <!-- Chat bubble floating -->
+                            <rect x="175" y="100" width="100" height="60" rx="12" fill="white" filter="url(#shadow)"/>
+                            <polygon points="175,132 162,140 175,148" fill="white"/>
+                            <rect x="185" y="112" width="60" height="5" rx="3" fill="var(--orange)"/>
+                            <rect x="185" y="122" width="45" height="4" rx="2" fill="#e5e7eb"/>
+                            <rect x="185" y="131" width="50" height="4" rx="2" fill="#e5e7eb"/>
+                            <rect x="185" y="140" width="35" height="4" rx="2" fill="#e5e7eb"/>
+
+                            <!-- Floating dots -->
+                            <circle cx="40" cy="80" r="8" fill="var(--orange)" opacity="0.25"/>
+                            <circle cx="270" cy="70" r="5" fill="var(--orange)" opacity="0.2"/>
+                            <circle cx="60" cy="140" r="4" fill="var(--orange-light)" opacity="0.3"/>
+
+                            <defs>
+                                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.1)"/>
+                                </filter>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Steps side -->
+                <div class="reveal">
+                    <span class="section-kicker">Simple Solutions!</span>
+                    <h2 class="section-title" style="text-align:left;margin-top:0.3rem">
+                        How JLN Hub <span>Works</span>
+                    </h2>
+                    <p style="color:var(--gray);margin-bottom:0.5rem">
+                        We understand that no two learners are alike. That's why we take the time to understand your needs.
+                    </p>
+
+                    <div class="how-steps">
+                        <div class="step">
+                            <div class="step-num">1</div>
+                            <div class="step-content">
+                                <h4>Create an Account</h4>
+                                <p>Register for free in seconds — no payment required to get started.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">2</div>
+                            <div class="step-content">
+                                <h4>Choose Your Grade & Subjects</h4>
+                                <p>Select your grade level and the subjects you want to study.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">3</div>
+                            <div class="step-content">
+                                <h4>Start Learning</h4>
+                                <p>Access lessons, take quizzes, and run simulations to master each topic.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">4</div>
+                            <div class="step-content">
+                                <h4>Track Your Progress</h4>
+                                <p>Monitor scores, quiz results, and completion rates from your dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="how-cta">
+                        <a href="pages/register.html" class="btn-primary btn-lg">Get Started</a>
+                        <a href="#services" class="btn-secondary-outline">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ABOUT / FEATURES ===== -->
+    <section class="features" id="about">
+        <div class="container">
+            <div class="features-grid">
+                <div class="reveal">
+                    <span class="section-kicker">Our Platform</span>
+                    <h2 class="section-title" style="text-align:left;margin-top:0.3rem">
+                        Our <span>Agency</span>
+                    </h2>
+                    <p style="color:var(--gray);margin-bottom:1.75rem">
+                        We believe in the power of education as the foundation for a better South Sudan. Our platform is built by educators and technologists who care about accessible, quality learning.
+                    </p>
+
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-wifi" style="color:var(--orange)"></i></div>
+                            <div>
+                                <h4>Offline-First Design</h4>
+                                <p>Works without internet. Perfect for areas with limited connectivity.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-robot" style="color:var(--orange)"></i></div>
+                            <div>
+                                <h4>AI-Enhanced Content</h4>
+                                <p>Lessons and quizzes generated and enhanced by AI for better understanding.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-chart-line" style="color:var(--orange)"></i></div>
+                            <div>
+                                <h4>Adaptive Learning</h4>
+                                <p>The platform adapts to each student's pace and performance over time.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-shield-alt" style="color:var(--orange)"></i></div>
+                            <div>
+                                <h4>Safe & Secure</h4>
+                                <p>Student data is kept private and secure at all times.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="pages/register.html" class="btn-primary btn-lg" style="margin-top:2rem">Read More</a>
+                </div>
+
+                <div class="features-visual reveal">
+                    <div class="features-img-wrap">
+                        <svg viewBox="0 0 300 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px">
+                            <!-- Desk/table -->
+                            <rect x="20" y="200" width="260" height="12" rx="6" fill="#2d2d44"/>
+                            <rect x="40" y="212" width="10" height="50" rx="5" fill="#2d2d44"/>
+                            <rect x="250" y="212" width="10" height="50" rx="5" fill="#2d2d44"/>
+                            <!-- Monitor -->
+                            <rect x="70" y="120" width="160" height="100" rx="10" fill="#2d2d44"/>
+                            <rect x="78" y="128" width="144" height="84" rx="6" fill="#3d3d5c"/>
+                            <!-- Monitor stand -->
+                            <rect x="140" y="200" width="20" height="12" rx="3" fill="#2d2d44"/>
+                            <rect x="125" y="210" width="50" height="8" rx="4" fill="#2d2d44"/>
+                            <!-- Screen content - bar chart -->
+                            <rect x="90" y="170" width="18" height="32" rx="3" fill="var(--orange)" opacity="0.9"/>
+                            <rect x="115" y="155" width="18" height="47" rx="3" fill="var(--orange-light)" opacity="0.8"/>
+                            <rect x="140" y="163" width="18" height="39" rx="3" fill="var(--orange)" opacity="0.7"/>
+                            <rect x="165" y="145" width="18" height="57" rx="3" fill="#27ae60" opacity="0.8"/>
+                            <rect x="190" y="158" width="18" height="44" rx="3" fill="var(--orange-light)" opacity="0.9"/>
+                            <!-- Donut chart -->
+                            <circle cx="186" cy="100" r="30" fill="none" stroke="var(--orange-pale2)" stroke-width="20"/>
+                            <circle cx="186" cy="100" r="30" fill="none" stroke="var(--orange)" stroke-width="20" stroke-dasharray="94 94" stroke-linecap="round" transform="rotate(-90 186 100)"/>
+                            <circle cx="186" cy="100" r="15" fill="white"/>
+                            <text x="182" y="105" fill="var(--orange)" font-size="11" font-weight="700">75%</text>
+                            <!-- Person sitting at desk -->
+                            <circle cx="100" cy="88" r="22" fill="#F4A261"/>
+                            <!-- Hair -->
+                            <path d="M80 83 Q88 65 100 63 Q112 65 120 83 Q115 70 100 68 Q85 70 80 83Z" fill="#2d2d44"/>
+                            <!-- Body -->
+                            <ellipse cx="100" cy="118" rx="20" ry="25" fill="#5c6bc0"/>
+                            <!-- Eyes -->
+                            <circle cx="93" cy="86" r="2.5" fill="#2d2d44"/>
+                            <circle cx="107" cy="86" r="2.5" fill="#2d2d44"/>
+                            <!-- Smile -->
+                            <path d="M93 96 Q100 101 107 96" stroke="#c25510" stroke-width="1.5" fill="none"/>
+                            <!-- Arms at keyboard -->
+                            <path d="M82 115 Q70 130 75 145" stroke="#5c6bc0" stroke-width="8" stroke-linecap="round"/>
+                            <path d="M118 115 Q130 130 125 145" stroke="#5c6bc0" stroke-width="8" stroke-linecap="round"/>
+                            <!-- Floating dots -->
+                            <circle cx="40" cy="50" r="8" fill="var(--orange)" opacity="0.2"/>
+                            <circle cx="280" cy="140" r="6" fill="var(--orange)" opacity="0.15"/>
+                        </svg>
+
+                        <!-- Stats bubbles -->
+                        <div class="stats-bubble sb-1">
+                            <div class="sb-icon"><i class="fas fa-users" style="color:var(--orange)"></i></div>
+                            <div class="sb-text">
+                                <strong>2,000+</strong>
+                                <span>Active Students</span>
+                            </div>
+                        </div>
+                        <div class="stats-bubble sb-2">
+                            <div class="sb-icon"><i class="fas fa-star" style="color:var(--orange)"></i></div>
+                            <div class="sb-text">
+                                <strong>4.9 / 5</strong>
+                                <span>Avg Rating</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-kicker">Reviews</span>
+                <h2 class="section-title">What <span>Students</span> Say!</h2>
+                <p class="section-sub">See how JLN Hub has helped students achieve their learning goals.</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal reveal-delay-1">
+                    <div class="tc-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="tc-text">"JLN Hub changed how I study. The AI lessons are incredibly clear, and I can use it even without internet. My grades improved a lot this term!"</p>
+                    <div class="tc-author">
+                        <div class="tc-avatar" style="background:linear-gradient(135deg,var(--orange),var(--orange-light))">A</div>
+                        <div class="tc-info">
+                            <strong>Akuot Deng</strong>
+                            <span>Grade 10 Student</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal reveal-delay-2">
+                    <div class="tc-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="tc-text">"The quizzes and simulations are so helpful for science. I finally understand concepts I struggled with for years. Highly recommended!"</p>
+                    <div class="tc-author">
+                        <div class="tc-avatar" style="background:linear-gradient(135deg,#27ae60,#2ecc71)">M</div>
+                        <div class="tc-info">
+                            <strong>Mathiang Juol</strong>
+                            <span>Grade 11 Student</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal reveal-delay-3">
+                    <div class="tc-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="tc-text">"As a teacher, I use JLN Hub to supplement my lessons. The admin dashboard is easy to use, and students really engage with the platform."</p>
+                    <div class="tc-author">
+                        <div class="tc-avatar" style="background:linear-gradient(135deg,#5c6bc0,#7986cb)">Y</div>
+                        <div class="tc-info">
+                            <strong>Yuma Wol</strong>
+                            <span>Secondary School Teacher</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA BANNER ===== -->
+    <section class="cta-banner">
+        <div class="container">
+            <div class="cta-banner-inner">
+                <div>
+                    <h2>Ready to get started?</h2>
+                    <p>Join thousands of students already learning with JLN Hub — it's free!</p>
+                </div>
+                <a href="pages/register.html" class="btn-white">
+                    Contact Us <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="landing.html" class="footer-logo">
+                        <div class="footer-logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <span class="footer-logo-text">JLN Hub</span>
+                    </a>
+                    <p>Jinubia Learning Nexus Hub — empowering South Sudan's next generation with accessible, quality education for everyone.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Courses</a></li>
+                        <li><a href="#testimonials">Team</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Learning</h4>
+                    <ul>
+                        <li><a href="pages/login.html">Subjects</a></li>
+                        <li><a href="pages/login.html">Lessons</a></li>
+                        <li><a href="pages/login.html">Quizzes</a></li>
+                        <li><a href="pages/login.html">Simulations</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span>&copy; 2026 Jinubia Learning Nexus Hub. All rights reserved.</span>
+                <span>Made with <span style="color:var(--orange)">♥</span> for South Sudan</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== MOBILE NAV TOGGLE =====
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+            navToggle.innerHTML = navLinks.classList.contains('open')
+                ? '<i class="fas fa-times"></i>'
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close mobile nav on link click
+        navLinks.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+                navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            });
+        });
+
+        // ===== SCROLL REVEAL =====
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ===== ACTIVE NAV LINK ON SCROLL =====
+        const sections = document.querySelectorAll('section[id]');
+        const navAnchors = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(sec => {
+                if (window.scrollY >= sec.offsetTop - 120) {
+                    current = sec.getAttribute('id');
+                }
+            });
+            navAnchors.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href') === '#' + current) {
+                    a.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

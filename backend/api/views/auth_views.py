@@ -35,9 +35,11 @@ class RegisterView(generics.CreateAPIView):
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
-                'last_name': user.last_name
+                'last_name': user.last_name,
+                'is_staff': user.is_staff,
             },
             'token': token.key,
+            'profile': None,
             'message': 'User registered successfully'
         }, status=status.HTTP_201_CREATED)
 

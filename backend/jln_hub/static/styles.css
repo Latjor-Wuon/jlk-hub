@@ -6,17 +6,20 @@
 }
 
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
+    --primary-color: #1a1a2e;
+    --secondary-color: #E8631A;
+    --secondary-hover: #c25510;
     --success-color: #27ae60;
     --danger-color: #e74c3c;
     --warning-color: #f39c12;
-    --bg-color: #ecf0f1;
+    --bg-color: #f9fafb;
     --card-bg: #ffffff;
-    --text-primary: #2c3e50;
-    --text-secondary: #7f8c8d;
-    --border-radius: 8px;
-    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --text-primary: #1a1a2e;
+    --text-secondary: #6b7280;
+    --border-radius: 10px;
+    --box-shadow: 0 2px 12px rgba(232, 99, 26, 0.08);
+    --orange-pale: #FFF3EA;
+    --orange-pale2: #FDE8D8;
 }
 
 /* Toast Notifications */
@@ -110,7 +113,7 @@
 }
 
 .toast-info .toast-icon {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-hover));
     color: white;
 }
 
@@ -133,52 +136,64 @@ body {
 
 /* Navigation */
 .navbar {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 1rem 0;
-    box-shadow: var(--box-shadow);
+    background-color: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(12px);
+    color: var(--text-primary);
+    padding: 0;
+    height: 68px;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .navbar .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100%;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
 .nav-brand h1 {
-    font-size: 1.5rem;
-    margin-bottom: 0.2rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.1rem;
+    color: var(--text-primary);
+}
+
+.nav-brand h1 span {
+    color: var(--secondary-color);
 }
 
 .tagline {
-    font-size: 0.85rem;
-    color: #bdc3c7;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
 }
 
 .nav-menu {
     display: flex;
     list-style: none;
-    gap: 1.5rem;
+    gap: 0.5rem;
     flex: 1;
     justify-content: center;
 }
 
 .nav-link {
-    color: white;
+    color: var(--text-primary);
     text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    transition: background-color 0.3s;
+    padding: 0.45rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.93rem;
+    transition: all 0.2s;
 }
 
 .nav-link:hover,
 .nav-link.active {
-    background-color: var(--secondary-color);
+    background-color: var(--orange-pale);
+    color: var(--secondary-color);
 }
 
 /* Main Content */
@@ -199,7 +214,7 @@ body {
 .hero {
     text-align: center;
     padding: 3rem 0;
-    background: linear-gradient(135deg, var(--secondary-color), var(--success-color));
+    background: linear-gradient(135deg, var(--secondary-color), #FF8C42);
     color: white;
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
@@ -527,7 +542,7 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #2980b9;
+    background-color: var(--secondary-hover);
 }
 
 .btn-success {
@@ -586,12 +601,14 @@ body {
 
 /* Footer */
 .footer {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: #1a1a2e;
+    color: rgba(255,255,255,0.7);
     padding: 2rem 0;
     text-align: center;
     margin-top: 3rem;
 }
+
+.footer a { color: var(--secondary-color); }
 
 .offline-indicator {
     margin-top: 0.5rem;
@@ -1000,14 +1017,51 @@ body {
    =========================================== */
 
 /* Simulations Page */
+.simulations-page {
+    padding: 2.5rem 0;
+}
+
 .simulations-page .page-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+    color: white;
     text-align: center;
-    margin-bottom: 2rem;
+    padding: 3rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.simulations-page .page-header::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    background: rgba(232,99,26,0.12);
+    border-radius: 50%;
+    top: -60px; right: -40px;
+}
+
+.simulations-page .page-header::after {
+    content: '';
+    position: absolute;
+    width: 120px; height: 120px;
+    background: rgba(232,99,26,0.08);
+    border-radius: 50%;
+    bottom: -30px; left: 40px;
 }
 
 .simulations-page .page-header h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
     margin-bottom: 0.5rem;
+    position: relative; z-index: 1;
+}
+
+.simulations-page .page-header p {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.05rem;
+    position: relative; z-index: 1;
 }
 
 .simulation-filters {
@@ -1015,42 +1069,54 @@ body {
     gap: 1rem;
     margin-bottom: 2rem;
     flex-wrap: wrap;
+    background: white;
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #f0f0f0;
 }
 
 .simulations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.25rem;
 }
 
 .simulation-card {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--box-shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: white;
+    border-radius: 14px;
+    padding: 0;
+    border: 1.5px solid #f0f0f0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .simulation-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 28px rgba(232,99,26,0.14);
+    border-color: var(--secondary-color);
 }
 
 .sim-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    padding: 1.5rem 1.5rem 0.5rem;
 }
 
 .sim-type-icon {
     font-size: 2rem;
+    line-height: 1;
 }
 
 .sim-difficulty {
     padding: 0.25rem 0.75rem;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 0.75rem;
+    font-weight: 700;
     text-transform: capitalize;
 }
 
@@ -1060,33 +1126,74 @@ body {
 
 .sim-title {
     font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0.5rem 1.5rem 0.65rem;
+    line-height: 1.3;
 }
 
 .sim-description {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    margin: 0 1.5rem 1.1rem;
+    line-height: 1.6;
 }
 
 .sim-meta {
     display: flex;
-    gap: 1rem;
-    font-size: 0.8rem;
+    gap: 0.75rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
-    margin-bottom: 1rem;
+    margin: 0 1.5rem 1.25rem;
+    flex-wrap: wrap;
+}
+
+.sim-meta span {
+    background: #f3f4f6;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+}
+
+.simulation-card .btn-primary {
+    margin: auto 1.5rem 1.75rem;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 0.6rem 1.25rem;
+    align-self: flex-start;
 }
 
 /* Simulation Viewer */
 .simulation-viewer {
-    padding: 1rem 0;
+    padding: 1.5rem 0;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.simulation-viewer #close-simulation {
+    margin-bottom: 1.75rem;
+    background: white;
+    border: 1.5px solid #e5e7eb;
+    padding: 0.65rem 1.25rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.simulation-viewer #close-simulation:hover {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
 }
 
 .simulation-container {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
+    background: white;
+    border-radius: 16px;
     padding: 2rem;
-    box-shadow: var(--box-shadow);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    border: 1px solid #f0f0f0;
 }
 
 .simulation-header {
@@ -1114,7 +1221,7 @@ body {
 }
 
 .sim-objectives {
-    background: #f0f9ff;
+    background: var(--orange-pale);
     padding: 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 1rem;
@@ -1957,23 +2064,39 @@ body {
    Quizzes Page Styles
 ======================================== */
 .quizzes-page {
-    padding: 1rem 0;
+    padding: 2.5rem 0;
 }
 
 .quizzes-page .page-header {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #FF8C42 100%);
+    color: white;
     text-align: center;
-    margin-bottom: 2rem;
+    padding: 3rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.quizzes-page .page-header::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    top: -60px; right: -40px;
 }
 
 .quizzes-page .page-header h1 {
-    font-size: 2rem;
-    color: var(--primary-color);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
     margin-bottom: 0.5rem;
 }
 
 .quizzes-page .page-header p {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
+    color: rgba(255,255,255,0.9);
+    font-size: 1.05rem;
 }
 
 .quiz-filters {
@@ -1981,139 +2104,191 @@ body {
     gap: 1rem;
     margin-bottom: 2rem;
     flex-wrap: wrap;
+    background: white;
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #f0f0f0;
 }
 
 .quizzes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-    padding: 1rem 0;
+    gap: 2.25rem;
+    padding: 0.5rem 0;
 }
 
 .quiz-card {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--box-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+    border-radius: 14px;
+    padding: 0;
+    border: 1.5px solid #f0f0f0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .quiz-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 28px rgba(232,99,26,0.14);
+    border-color: var(--secondary-color);
 }
 
 .quiz-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    padding: 1.5rem 1.5rem 0.5rem;
 }
 
 .quiz-card-header .quiz-icon {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .quiz-card-header .question-count {
-    background: var(--secondary-color);
-    color: white;
-    padding: 0.25rem 0.75rem;
+    background: var(--orange-pale);
+    color: var(--secondary-color);
+    padding: 0.3rem 0.85rem;
     border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: 1px solid var(--orange-pale2);
 }
 
 .quiz-card .quiz-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 1.5rem 0.6rem;
+    line-height: 1.3;
 }
 
 .quiz-card .quiz-lesson {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    margin: 0 1.5rem 1rem;
 }
 
 .quiz-card .quiz-meta {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin: 0 1.5rem 1rem;
     flex-wrap: wrap;
 }
 
 .quiz-card .subject-badge,
 .quiz-card .grade-badge {
-    background: #f0f0f0;
-    color: #666;
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
 }
 
 .quiz-card .subject-badge {
-    background: #e3f2fd;
-    color: #1976d2;
+    background: var(--orange-pale);
+    color: var(--secondary-color);
+}
+
+.quiz-card .grade-badge {
+    background: #f3f4f6;
+    color: var(--text-secondary);
 }
 
 .quiz-card .quiz-instructions {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    margin: 0 1.5rem 1.25rem;
     flex-grow: 1;
+    line-height: 1.6;
 }
 
 .quiz-card .quiz-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
+    padding: 1.1rem 1.5rem;
+    border-top: 1px solid #f3f4f6;
+    background: #fafafa;
+    margin-top: auto;
 }
 
 .quiz-card .passing-score {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--success-color);
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .quiz-card .start-quiz {
     padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.no-quizzes {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e5e7eb;
+}
+
+.no-quizzes h3 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.no-quizzes p {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
 }
 
 /* Quiz Viewer */
 .quiz-viewer {
     max-width: 800px;
     margin: 0 auto;
+    padding: 0.5rem 0;
 }
 
 .quiz-viewer .btn-back {
-    margin-bottom: 1.5rem;
-    background: #f0f0f0;
-    border: none;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
+    margin-bottom: 1.75rem;
+    background: white;
+    border: 1.5px solid #e5e7eb;
+    padding: 0.65rem 1.25rem;
+    border-radius: 50px;
     cursor: pointer;
-    font-size: 0.95rem;
-    transition: background 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .quiz-viewer .btn-back:hover {
-    background: #e0e0e0;
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
 }
 
 .quiz-detail-header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    padding: 2rem;
-    border-radius: var(--border-radius);
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
     margin-bottom: 2rem;
 }
 
 .quiz-detail-header h2 {
     font-size: 1.75rem;
+    font-weight: 800;
     margin-bottom: 0.5rem;
 }
 
@@ -2124,7 +2299,7 @@ body {
 }
 
 .quiz-detail-header .quiz-detail-lesson {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     opacity: 0.8;
 }
 

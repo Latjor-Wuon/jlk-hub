@@ -16,7 +16,8 @@ urlpatterns = [
     path('api/', include('api.urls')),
     
     # Main pages
-    path('', template_view('index.html'), name='index'),
+    path('', template_view('landing.html'), name='index'),
+    path('landing.html', template_view('landing.html'), name='landing'),
     path('home.html', template_view('home.html'), name='home'),
     path('subjects.html', template_view('subjects.html'), name='subjects'),
     path('lessons.html', template_view('lessons.html'), name='lessons'),

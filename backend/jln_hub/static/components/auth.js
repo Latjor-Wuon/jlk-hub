@@ -3,8 +3,8 @@
 class AuthManager {
     constructor() {
         this.token = localStorage.getItem('jln_token');
-        this.user = JSON.parse(localStorage.getItem('jln_user') || 'null');
-        this.profile = JSON.parse(localStorage.getItem('jln_profile') || 'null');
+        try { this.user = JSON.parse(localStorage.getItem('jln_user') || 'null'); } catch(e) { this.user = null; }
+        try { this.profile = JSON.parse(localStorage.getItem('jln_profile') || 'null'); } catch(e) { this.profile = null; }
         this.csrfInitialized = false;
     }
 
@@ -120,6 +120,7 @@ class AuthManager {
             }
         }
         this.clearAuthData();
+        window.location.href = '/landing.html';
     }
 
     setAuthData(data) {
@@ -129,7 +130,7 @@ class AuthManager {
 
         localStorage.setItem('jln_token', data.token);
         localStorage.setItem('jln_user', JSON.stringify(data.user));
-        localStorage.setItem('jln_profile', JSON.stringify(data.profile));
+        localStorage.setItem('jln_profile', JSON.stringify(data.profile ?? null));
     }
 
     clearAuthData() {
