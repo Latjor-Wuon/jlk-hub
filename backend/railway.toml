@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "python manage.py collectstatic --noinput --clear"
+
+[deploy]
+startCommand = "gunicorn jln_hub.wsgi:application"
+healthcheckPath = "/api/system/health/"
+restartPolicyType = "on_failure"
